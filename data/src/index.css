@@ -1,0 +1,179 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Forensic Investigation Tool Design System - Professional Dark Theme */
+
+@layer base {
+  :root {
+    /* Professional Forensic Theme - Dark by default */
+    --background: 220 15% 8%;
+    --foreground: 210 15% 95%;
+
+    --card: 220 15% 10%;
+    --card-foreground: 210 15% 95%;
+
+    --popover: 220 15% 10%;
+    --popover-foreground: 210 15% 95%;
+
+    /* Investigation Blue - Primary Action Color */
+    --primary: 195 85% 55%;
+    --primary-foreground: 220 15% 8%;
+    --primary-glow: 195 85% 65%;
+
+    /* Secondary - Darker Cards/Elements */
+    --secondary: 220 15% 12%;
+    --secondary-foreground: 210 15% 85%;
+
+    /* Muted - Subtle Elements */
+    --muted: 220 12% 15%;
+    --muted-foreground: 210 10% 60%;
+
+    /* Accent - Teal for Highlights */
+    --accent: 180 80% 50%;
+    --accent-foreground: 220 15% 8%;
+    --accent-glow: 180 80% 65%;
+
+    /* Destructive - Alert Red */
+    --destructive: 0 75% 60%;
+    --destructive-foreground: 210 15% 95%;
+
+    /* Borders and Inputs - Subtle */
+    --border: 220 12% 20%;
+    --input: 220 12% 18%;
+    --ring: 195 85% 55%;
+
+    /* Success - Evidence Found Green */
+    --success: 145 70% 50%;
+    --success-foreground: 220 15% 8%;
+
+    /* Warning - Important Evidence Yellow */
+    --warning: 45 90% 60%;
+    --warning-foreground: 220 15% 8%;
+
+    /* Gradients for Professional Look */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent-glow)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(220 15% 12%));
+    --gradient-subtle: linear-gradient(180deg, hsl(220 15% 8%), hsl(220 15% 10%));
+
+    /* Shadows with Investigation Blue Glow */
+    --shadow-primary: 0 10px 30px -10px hsl(var(--primary) / 0.3);
+    --shadow-accent: 0 10px 30px -10px hsl(var(--accent) / 0.3);
+    --shadow-card: 0 4px 20px -4px hsl(220 15% 5% / 0.5);
+    --shadow-glow: 0 0 40px hsl(var(--primary-glow) / 0.4);
+
+    /* Animation Variables */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --radius: 0.5rem;
+
+    /* Sidebar Variables */
+    --sidebar-background: 220 15% 6%;
+    --sidebar-foreground: 210 15% 85%;
+    --sidebar-primary: 195 85% 55%;
+    --sidebar-primary-foreground: 220 15% 6%;
+    --sidebar-accent: 220 15% 12%;
+    --sidebar-accent-foreground: 210 15% 85%;
+    --sidebar-border: 220 12% 18%;
+    --sidebar-ring: 195 85% 55%;
+  }
+
+  /* Light theme override (if needed for reports/printing) */
+  .light {
+    --background: 210 20% 98%;
+    --foreground: 220 15% 15%;
+    --card: 210 20% 100%;
+    --card-foreground: 220 15% 15%;
+    --primary: 195 85% 45%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 210 20% 95%;
+    --secondary-foreground: 220 15% 15%;
+    --muted: 210 20% 92%;
+    --muted-foreground: 220 10% 40%;
+    --accent: 180 80% 40%;
+    --accent-foreground: 210 20% 98%;
+    --border: 210 15% 85%;
+    --input: 210 15% 90%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    background: linear-gradient(135deg, hsl(var(--background)), hsl(220 15% 6%));
+    min-height: 100vh;
+  }
+
+  /* Professional Typography */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+
+  h1 { @apply text-3xl md:text-4xl; }
+  h2 { @apply text-2xl md:text-3xl; }
+  h3 { @apply text-xl md:text-2xl; }
+  h4 { @apply text-lg md:text-xl; }
+
+  /* Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.6);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.8);
+  }
+}
+
+@layer components {
+  /* Professional Card Components */
+  .card-professional {
+    @apply bg-card/80 backdrop-blur-sm border border-border/50 rounded-lg shadow-lg;
+    background: var(--gradient-card);
+    box-shadow: var(--shadow-card);
+  }
+
+  .card-glow {
+    @apply card-professional;
+    box-shadow: var(--shadow-primary);
+  }
+
+  /* Investigation Status Indicators */
+  .status-active {
+    @apply bg-success/20 text-success border border-success/30 px-2 py-1 rounded-full text-xs font-medium;
+  }
+
+  .status-pending {
+    @apply bg-warning/20 text-warning border border-warning/30 px-2 py-1 rounded-full text-xs font-medium;
+  }
+
+  .status-alert {
+    @apply bg-destructive/20 text-destructive border border-destructive/30 px-2 py-1 rounded-full text-xs font-medium;
+  }
+
+  /* Hover Effects */
+  .hover-glow {
+    @apply transition-all duration-300 hover:shadow-lg;
+    transition: var(--transition-smooth);
+  }
+
+  .hover-glow:hover {
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-2px);
+  }
+}
