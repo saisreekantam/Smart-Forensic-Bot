@@ -380,7 +380,7 @@ CASE INFORMATION:
 - Case Type: {case.case_type or 'General Investigation'}
 - Lead Investigator: {case.investigator_name}
 - Department: {case.department or 'Unknown'}
-- Case Status: {case.status.value}
+- Case Status: {case.status}
 - Priority Level: {case.priority}
 
 INVESTIGATION QUERY: {query}
@@ -464,7 +464,7 @@ Please provide your forensic analysis of this evidence in response to the query.
                 "case_overview": {
                     "case_number": case.case_number,
                     "title": case.title,
-                    "status": case.status.value,
+                    "status": case.status,  # Already a string
                     "investigator": case.investigator_name,
                     "created": case.created_at.isoformat(),
                     "last_updated": case.updated_at.isoformat()

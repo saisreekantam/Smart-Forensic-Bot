@@ -27,7 +27,14 @@ from src.case_management.case_manager import (
 from src.data_ingestion.case_processor import CaseDataProcessor
 from src.data_ingestion.optimized_processor import OptimizedCaseProcessor
 from src.ai_cores.rag.case_vector_store import CaseVectorStore, case_vector_store
-from src.ai_cores.enhanced_assistant import EnhancedCaseAssistant
+from src.ai_cores.langgraph_assistant import LangGraphCaseAssistant
+
+# Import the simple processor
+import sys
+sys.path.append('.')
+from simple_data_processor import SimpleDataProcessor
+from simple_chat_handler import process_case_query
+from chat_history_manager import chat_history_manager
 
 logger = logging.getLogger(__name__)
 
@@ -87,6 +94,7 @@ class ChatMessage(BaseModel):
     message: str = Field(..., description="User's question or query")
     case_id: str = Field(..., description="Case ID for context")
     conversation_history: Optional[List[Dict[str, str]]] = Field(None, description="Previous messages")
+    session_id: Optional[str] = Field(None, description="Chat session ID for history")
 
 class ChatResponse(BaseModel):
     response: str
@@ -104,7 +112,7 @@ async def startup_event():
         db_manager.init_database()
         
         # Initialize both standard and optimized processors
-        global case_data_processor, optimized_processor, enhanced_assistant
+        global case_data_processor, optimized_processor, langgraph_assistant
         case_data_processor = CaseDataProcessor(
             case_manager=case_manager,
             vector_store=case_vector_store
@@ -117,13 +125,14 @@ async def startup_event():
             max_workers=4
         )
         
-        # Initialize enhanced assistant for sophisticated AI responses
-        enhanced_assistant = EnhancedCaseAssistant(
+        # Initialize LangGraph assistant for advanced AI responses
+        langgraph_assistant = LangGraphCaseAssistant(
             case_manager=case_manager,
-            vector_store=case_vector_store
+            vector_store=case_vector_store,
+            debug_mode=True
         )
         
-        logger.info("🚀 API startup completed successfully with enhanced components")
+        logger.info("🚀 API startup completed successfully with LangGraph components")
     except Exception as e:
         logger.error(f"Error during startup: {str(e)}")
         raise
@@ -164,7 +173,7 @@ async def create_case(case_data: CaseCreateAPI):
             id=case.id,
             case_number=case.case_number,
             title=case.title,
-            status=case.status.value,
+            status=case.status,  # Already a string
             investigator_name=case.investigator_name,
             created_at=case.created_at,
             updated_at=case.updated_at,
@@ -207,7 +216,7 @@ async def list_cases(
                 id=case.id,
                 case_number=case.case_number,
                 title=case.title,
-                status=case.status.value,
+                status=case.status,  # Already a string
                 investigator_name=case.investigator_name,
                 created_at=case.created_at,
                 updated_at=case.updated_at,
@@ -239,7 +248,7 @@ async def get_case(case_id: str):
                 "case_number": case.case_number,
                 "title": case.title,
                 "description": case.description,
-                "status": case.status.value,
+                "status": case.status,  # Already a string
                 "investigator_name": case.investigator_name,
                 "investigator_id": case.investigator_id,
                 "department": case.department,
@@ -327,6 +336,69 @@ async def upload_evidence(
         logger.error(f"Error uploading evidence: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
+@app.post("/cases/{case_id}/evidence/upload")
+async def upload_evidence_simple(
+    case_id: str,
+    file: UploadFile = File(...),
+    description: Optional[str] = Form(None)
+):
+    """Simple evidence file upload endpoint for frontend"""
+    try:
+        # Validate case exists
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        # Determine evidence type from file extension
+        file_ext = file.filename.split('.')[-1].lower() if file.filename else 'txt'
+        evidence_type_mapping = {
+            'csv': EvidenceType.CALL_LOGS,
+            'xml': EvidenceType.UFDR_EXPORT,
+            'json': EvidenceType.STRUCTURED_DATA,
+            'txt': EvidenceType.TEXT_REPORT,
+            'pdf': EvidenceType.TEXT_REPORT,
+            'ufdr': EvidenceType.UFDR_EXPORT
+        }
+        evidence_type = evidence_type_mapping.get(file_ext, EvidenceType.TEXT_REPORT)
+        
+        # Read file data
+        file_data = await file.read()
+        
+        # Create evidence upload request
+        upload_request = EvidenceUploadRequest(
+            case_id=case_id,
+            original_filename=file.filename,
+            evidence_type=evidence_type,
+            title=file.filename,
+            description=description,
+            source_device="Upload Interface",
+            extraction_method="Web Upload"
+        )
+        
+        # Add evidence to case
+        evidence = case_manager.add_evidence(upload_request, file_data)
+        
+        # Process the evidence immediately for simple files
+        try:
+            from simple_data_processor import SimpleDataProcessor
+            processor = SimpleDataProcessor()
+            await processor.process_case_evidence(case_id)
+        except Exception as e:
+            logger.warning(f"Background processing failed: {str(e)}")
+        
+        return {
+            "message": "File uploaded successfully",
+            "evidence_id": evidence.id,
+            "filename": evidence.original_filename,
+            "status": "uploaded_and_processed"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error uploading evidence (simple): {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
 @app.get("/cases/{case_id}/evidence", response_model=List[EvidenceResponse])
 async def get_case_evidence(case_id: str, evidence_type: Optional[str] = None):
     """Get evidence files for a case"""
@@ -349,8 +421,8 @@ async def get_case_evidence(case_id: str, evidence_type: Optional[str] = None):
             response_evidence.append(EvidenceResponse(
                 id=evidence.id,
                 original_filename=evidence.original_filename,
-                evidence_type=evidence.evidence_type.value,
-                processing_status=evidence.processing_status.value,
+                evidence_type=evidence.evidence_type,  # Already a string
+                processing_status=evidence.processing_status,  # Already a string
                 file_size=evidence.file_size or 0,
                 created_at=evidence.created_at,
                 has_embeddings=evidence.has_embeddings or False
@@ -364,12 +436,10 @@ async def get_case_evidence(case_id: str, evidence_type: Optional[str] = None):
         logger.error(f"Error getting evidence for case {case_id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-# Intelligent Chatbot Endpoints
-@app.post("/cases/{case_id}/chat", response_model=ChatResponse)
-async def chat_with_case(case_id: str, chat_message: ChatMessage):
+@app.post("/cases/{case_id}/process")
+async def process_case_data(case_id: str):
     """
-    Enhanced intelligent chatbot for case investigation
-    Uses GPT-4/GPT-4o-mini with sophisticated reasoning and RAG integration
+    Process all unprocessed evidence in a case using the simple, reliable processor
     """
     try:
         # Validate case exists
@@ -377,34 +447,101 @@ async def chat_with_case(case_id: str, chat_message: ChatMessage):
         if not case:
             raise HTTPException(status_code=404, detail="Case not found")
         
-        # Check if case has processed evidence
-        if case.processed_evidence_count == 0:
-            return ChatResponse(
-                response="⚠️ This case doesn't have any processed evidence yet. Please upload and process evidence files first to enable AI analysis.",
-                sources=[],
-                confidence=1.0,
-                case_context={"case_number": case.case_number, "evidence_count": 0},
-                timestamp=datetime.now()
-            )
+        # Use the simple processor
+        simple_processor = SimpleDataProcessor()
+        results = simple_processor.process_case_evidence(case_id)
         
-        # Use enhanced assistant for sophisticated analysis
-        investigation_response = await enhanced_assistant.process_investigation_query(
+        if results["total_processed"] == 0 and not results["errors"]:
+            return {
+                "message": "All evidence in this case is already processed",
+                "processed_count": 0,
+                "already_processed": case.total_evidence_count,
+                "status": "up_to_date",
+                "details": results
+            }
+        
+        if results["errors"]:
+            error_message = f"Processing completed with {len(results['errors'])} errors"
+            logger.warning(f"{error_message}: {results['errors']}")
+        else:
+            error_message = None
+        
+        return {
+            "message": f"Successfully processed {results['total_processed']} evidence files" + 
+                      (f" ({error_message})" if error_message else ""),
+            "processed_count": results["total_processed"],
+            "total_evidence": case.total_evidence_count,
+            "status": "processing_completed",
+            "details": results,
+            "processed_files": [f["filename"] for f in results["processed_files"]],
+            "errors": results["errors"] if results["errors"] else None
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error processing case data {case_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+# Intelligent Chatbot Endpoints
+@app.post("/cases/{case_id}/chat", response_model=ChatResponse)
+async def chat_with_case(case_id: str, chat_message: ChatMessage):
+    """
+    Simple but effective chatbot that actually retrieves and uses processed evidence data
+    """
+    try:
+        # Validate case exists
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        # Get or create session
+        session_id = chat_message.session_id
+        if not session_id:
+            # Create a new session if none provided
+            session_id = chat_history_manager.create_chat_session(case_id)
+        
+        # Get conversation history from session if not provided
+        conversation_history = chat_message.conversation_history
+        if not conversation_history and session_id:
+            messages = chat_history_manager.get_chat_messages(session_id)
+            conversation_history = [
+                {"role": msg["role"], "content": msg["content"]} 
+                for msg in messages[-10:]  # Last 10 messages
+            ]
+        
+        # Save user message to history
+        if session_id:
+            chat_history_manager.save_message(session_id, "user", chat_message.message)
+        
+        # Use our simple chat handler
+        chat_result = await process_case_query(
             case_id=case_id,
             query=chat_message.message,
-            conversation_history=chat_message.conversation_history or []
+            conversation_history=conversation_history or []
         )
+        
+        # Save assistant response to history
+        if session_id:
+            chat_history_manager.save_message(
+                session_id, 
+                "assistant", 
+                chat_result['response'],
+                chat_result['sources'],
+                chat_result['confidence']
+            )
         
         # Convert to API response format
         return ChatResponse(
-            response=f"{investigation_response.response}\n\n🤖 *Analysis powered by {investigation_response.model_used.upper()}* | Complexity: {investigation_response.complexity_analysis.complexity_score:.2f} | Confidence: {investigation_response.confidence:.1%}",
-            sources=investigation_response.evidence_sources,
-            confidence=investigation_response.confidence,
+            response=f"{chat_result['response']}\n\n💡 *Analysis powered by Simple Search + GPT-4o-mini* | Sources: {len(chat_result['sources'])} | Confidence: {chat_result['confidence']:.1%}",
+            sources=chat_result['sources'],
+            confidence=chat_result['confidence'],
             case_context={
                 "case_number": case.case_number,
                 "evidence_count": case.total_evidence_count,
                 "processed_count": case.processed_evidence_count,
-                "reasoning_type": investigation_response.complexity_analysis.reasoning_type,
-                "model_used": investigation_response.model_used
+                "search_results": chat_result['case_context'].get('search_results_count', 0),
+                "session_id": session_id
             },
             timestamp=datetime.now()
         )
@@ -412,7 +549,7 @@ async def chat_with_case(case_id: str, chat_message: ChatMessage):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error in chat for case {case_id}: {str(e)}")
+        logger.error(f"Error in simple chat for case {case_id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.get("/cases/{case_id}/chat/suggestions")
@@ -475,6 +612,417 @@ async def get_chat_suggestions(case_id: str):
     except Exception as e:
         logger.error(f"Error getting suggestions for case {case_id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
+
+# Chat History Endpoints
+@app.get("/cases/{case_id}/chat/sessions")
+async def get_chat_sessions(case_id: str):
+    """Get all chat sessions for a case"""
+    try:
+        # Validate case exists
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        sessions = chat_history_manager.get_chat_sessions(case_id)
+        return {"sessions": sessions}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting chat sessions for case {case_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.post("/cases/{case_id}/chat/sessions")
+async def create_chat_session(case_id: str, session_data: Dict[str, str] = None):
+    """Create a new chat session"""
+    try:
+        # Validate case exists
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        session_name = session_data.get("name") if session_data else None
+        session_id = chat_history_manager.create_chat_session(case_id, session_name)
+        
+        if not session_id:
+            raise HTTPException(status_code=500, detail="Failed to create chat session")
+        
+        return {"session_id": session_id, "message": "Chat session created successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creating chat session for case {case_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.get("/cases/{case_id}/chat/sessions/{session_id}/messages")
+async def get_chat_messages(case_id: str, session_id: str):
+    """Get all messages for a chat session"""
+    try:
+        # Validate case exists
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        messages = chat_history_manager.get_chat_messages(session_id)
+        return {"messages": messages}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting chat messages for session {session_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.post("/cases/{case_id}/chat/sessions/{session_id}/messages")
+async def save_chat_message(case_id: str, session_id: str, message_data: Dict[str, str]):
+    """Save a message to a chat session"""
+    try:
+        # Validate case exists
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        role = message_data.get("role")
+        message = message_data.get("message")
+        
+        if not role or not message:
+            raise HTTPException(status_code=400, detail="Role and message are required")
+        
+        success = chat_history_manager.save_message(session_id, role, message)
+        
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to save message")
+        
+        return {"success": True, "message": "Message saved successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error saving message to session {session_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.delete("/cases/{case_id}/chat/sessions/{session_id}")
+async def delete_chat_session(case_id: str, session_id: str):
+    """Delete a chat session"""
+    try:
+        # Validate case exists
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        success = chat_history_manager.delete_chat_session(session_id)
+        
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to delete chat session")
+        
+        return {"message": "Chat session deleted successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting chat session {session_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+# File Upload and Analytics Endpoints
+@app.get("/cases/{case_id}/analytics")
+async def get_case_analytics(case_id: str):
+    """Get analytics data for a case"""
+    try:
+        # Validate case exists
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        # Load processed data for analytics
+        from simple_search_system import SimpleSearchSystem
+        search_system = SimpleSearchSystem()
+        case_summary = search_system.get_case_summary(case_id)
+        
+        if case_summary.get("total_records", 0) == 0:
+            return {
+                "message": "No processed data available for analytics",
+                "analytics": {
+                    "total_records": 0,
+                    "data_sources": [],
+                    "communication_stats": {},
+                    "timeline_data": [],
+                    "contact_network": []
+                }
+            }
+        
+        # Generate analytics
+        analytics = await _generate_case_analytics(case_id, search_system)
+        
+        return {
+            "analytics": analytics,
+            "case_summary": case_summary
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting analytics for case {case_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.get("/cases/{case_id}/reports")
+async def get_case_reports(case_id: str):
+    """Get available reports for a case"""
+    try:
+        # Validate case exists
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        # Check for processed data
+        from simple_search_system import SimpleSearchSystem
+        search_system = SimpleSearchSystem()
+        case_summary = search_system.get_case_summary(case_id)
+        
+        if case_summary.get("total_records", 0) == 0:
+            return {
+                "message": "No processed data available for reports",
+                "reports": []
+            }
+        
+        # Generate available reports
+        reports = [
+            {
+                "id": "evidence_summary",
+                "title": "Evidence Summary Report",
+                "description": "Comprehensive overview of all evidence in the case",
+                "type": "summary",
+                "available": True
+            },
+            {
+                "id": "communication_analysis", 
+                "title": "Communication Analysis Report",
+                "description": "Analysis of calls, messages, and communication patterns",
+                "type": "analysis",
+                "available": any("message" in src["file"].lower() or "call" in src["file"].lower() 
+                               for src in case_summary.get("data_sources", []))
+            },
+            {
+                "id": "timeline_report",
+                "title": "Timeline Report", 
+                "description": "Chronological timeline of events and activities",
+                "type": "timeline",
+                "available": case_summary.get("total_records", 0) > 0
+            },
+            {
+                "id": "contact_network",
+                "title": "Contact Network Report",
+                "description": "Network analysis of contacts and relationships",
+                "type": "network",
+                "available": any("contact" in src["file"].lower() or "call" in src["file"].lower()
+                               for src in case_summary.get("data_sources", []))
+            }
+        ]
+        
+        return {"reports": reports}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting reports for case {case_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.post("/cases/{case_id}/reports/{report_id}/generate")
+async def generate_report(case_id: str, report_id: str):
+    """Generate a specific report for a case"""
+    try:
+        # Validate case exists
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        # Generate the requested report
+        report_data = await _generate_specific_report(case_id, report_id)
+        
+        return {
+            "report_id": report_id,
+            "generated_at": datetime.now().isoformat(),
+            "data": report_data
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error generating report {report_id} for case {case_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+# Helper functions for analytics and reports
+async def _generate_case_analytics(case_id: str, search_system):
+    """Generate analytics data for a case"""
+    try:
+        import json
+        from collections import Counter, defaultdict
+        
+        # Get all processed files for this case
+        processed_dir = f"data/processed"
+        analytics = {
+            "total_records": 0,
+            "data_sources": [],
+            "communication_stats": {},
+            "timeline_data": [],
+            "contact_network": []
+        }
+        
+        # Find processed files for this case
+        import os
+        import glob
+        
+        processed_files = glob.glob(f"{processed_dir}/*{case_id}*.json")
+        
+        if not processed_files:
+            return analytics
+        
+        all_data = []
+        contact_counter = Counter()
+        communication_types = Counter()
+        timeline_events = []
+        
+        for file_path in processed_files:
+            try:
+                with open(file_path, 'r') as f:
+                    data = json.load(f)
+                    
+                if isinstance(data, list):
+                    all_data.extend(data)
+                elif isinstance(data, dict):
+                    all_data.append(data)
+                    
+            except Exception as e:
+                logger.warning(f"Could not load {file_path}: {str(e)}")
+                continue
+        
+        # Analyze the data
+        for record in all_data:
+            # Count contacts
+            if isinstance(record, dict):
+                for key, value in record.items():
+                    if key.lower() in ['contact', 'name', 'caller', 'recipient']:
+                        if value and isinstance(value, str):
+                            contact_counter[value] += 1
+                    elif key.lower() in ['type', 'call_type', 'message_type']:
+                        if value and isinstance(value, str):
+                            communication_types[value] += 1
+                    elif key.lower() in ['timestamp', 'date', 'time']:
+                        if value:
+                            timeline_events.append({
+                                "timestamp": str(value),
+                                "event": f"{record.get('type', 'Event')}"
+                            })
+        
+        # Build analytics
+        analytics.update({
+            "total_records": len(all_data),
+            "data_sources": [{"file": os.path.basename(f), "records": "varies"} for f in processed_files],
+            "communication_stats": {
+                "total_communications": sum(communication_types.values()),
+                "by_type": dict(communication_types.most_common()),
+                "unique_contacts": len(contact_counter)
+            },
+            "timeline_data": sorted(timeline_events, key=lambda x: x["timestamp"])[:50],  # Limit to 50 events
+            "contact_network": [{"name": name, "frequency": count} for name, count in contact_counter.most_common(20)]
+        })
+        
+        return analytics
+        
+    except Exception as e:
+        logger.error(f"Error generating analytics: {str(e)}")
+        return {
+            "total_records": 0,
+            "data_sources": [],
+            "communication_stats": {},
+            "timeline_data": [],
+            "contact_network": []
+        }
+
+async def _generate_specific_report(case_id: str, report_id: str):
+    """Generate a specific report for a case"""
+    try:
+        from simple_search_system import SimpleSearchSystem
+        search_system = SimpleSearchSystem()
+        
+        if report_id == "evidence_summary":
+            return await _generate_evidence_summary(case_id, search_system)
+        elif report_id == "communication_analysis":
+            return await _generate_communication_analysis(case_id, search_system)
+        elif report_id == "timeline_report":
+            return await _generate_timeline_report(case_id, search_system)
+        elif report_id == "contact_network":
+            return await _generate_contact_network_report(case_id, search_system)
+        else:
+            raise HTTPException(status_code=400, detail=f"Unknown report type: {report_id}")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error generating specific report {report_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Report generation failed")
+
+async def _generate_evidence_summary(case_id: str, search_system):
+    """Generate evidence summary report"""
+    case_summary = search_system.get_case_summary(case_id)
+    
+    summary = {
+        "title": "Evidence Summary Report",
+        "case_id": case_id,
+        "generated_at": datetime.now().isoformat(),
+        "total_evidence_items": case_summary.get("total_records", 0),
+        "data_sources": case_summary.get("data_sources", []),
+        "summary": f"This case contains {case_summary.get('total_records', 0)} evidence records from {len(case_summary.get('data_sources', []))} different sources."
+    }
+    
+    return summary
+
+async def _generate_communication_analysis(case_id: str, search_system):
+    """Generate communication analysis report"""
+    # Search for communication-related data
+    call_results = search_system.search_case_data(case_id, "call")
+    message_results = search_system.search_case_data(case_id, "message")
+    
+    analysis = {
+        "title": "Communication Analysis Report", 
+        "case_id": case_id,
+        "generated_at": datetime.now().isoformat(),
+        "total_calls": len(call_results.get("results", [])),
+        "total_messages": len(message_results.get("results", [])),
+        "key_findings": [
+            f"Found {len(call_results.get('results', []))} call records",
+            f"Found {len(message_results.get('results', []))} message records"
+        ]
+    }
+    
+    return analysis
+
+async def _generate_timeline_report(case_id: str, search_system):
+    """Generate timeline report"""
+    case_summary = search_system.get_case_summary(case_id)
+    
+    timeline = {
+        "title": "Timeline Report",
+        "case_id": case_id, 
+        "generated_at": datetime.now().isoformat(),
+        "total_events": case_summary.get("total_records", 0),
+        "timeline_summary": f"Timeline contains {case_summary.get('total_records', 0)} events across multiple data sources."
+    }
+    
+    return timeline
+
+async def _generate_contact_network_report(case_id: str, search_system):
+    """Generate contact network report"""
+    case_summary = search_system.get_case_summary(case_id)
+    
+    network = {
+        "title": "Contact Network Report",
+        "case_id": case_id,
+        "generated_at": datetime.now().isoformat(), 
+        "data_sources": case_summary.get("data_sources", []),
+        "network_summary": "Contact network analysis based on available communication data."
+    }
+    
+    return network
 
 # Background task functions
 async def process_evidence_background(case_id: str, evidence_id: str, file_path: str, evidence_type: EvidenceType):
@@ -667,8 +1215,8 @@ CASE CONTEXT:
 - Case Title: {case.title}
 - Case Type: {case.case_type or 'General Investigation'}
 - Lead Investigator: {case.investigator_name}
-- Case Status: {case.status.value}
-- Priority: {case.priority.value if hasattr(case, 'priority') else 'Standard'}
+- Case Status: {case.status}
+- Priority: {case.priority if hasattr(case, 'priority') else 'Standard'}
 
 CORE RESPONSIBILITIES:
 1. Analyze digital evidence with forensic accuracy

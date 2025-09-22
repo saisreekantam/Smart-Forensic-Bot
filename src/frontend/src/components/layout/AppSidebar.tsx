@@ -13,6 +13,7 @@ import {
   Network,
   Eye,
   ChevronRight,
+  FolderOpen,
 } from "lucide-react";
 
 import {
@@ -29,7 +30,8 @@ import {
 } from "@/components/ui/sidebar";
 
 const mainItems = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Cases", url: "/", icon: FolderOpen },
   { title: "Query Interface", url: "/query", icon: Search },
   { title: "Upload UFDR", url: "/upload", icon: Upload },
   { title: "Reports", url: "/reports", icon: FileText },

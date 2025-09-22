@@ -235,19 +235,18 @@ class CaseManager:
                 f.write(file_data)
             
             # Create evidence record
-            evidence = Evidence(
-                case_id=request.case_id,
-                original_filename=request.original_filename,
-                file_path=str(file_path),
-                file_size=len(file_data),
-                file_hash=file_hash,
-                evidence_type=request.evidence_type,
-                title=request.title,
-                description=request.description,
-                source_device=request.source_device,
-                extraction_method=request.extraction_method,
-                evidence_date=request.evidence_date
-            )
+            evidence = Evidence()
+            evidence.case_id = request.case_id
+            evidence.original_filename = request.original_filename
+            evidence.file_path = str(file_path)
+            evidence.file_size = len(file_data)
+            evidence.file_hash = file_hash
+            evidence.evidence_type = request.evidence_type.value  # Store enum value as string
+            evidence.title = request.title
+            evidence.description = request.description
+            evidence.source_device = request.source_device
+            evidence.extraction_method = request.extraction_method
+            evidence.evidence_date = request.evidence_date
             
             session.add(evidence)
             
@@ -275,7 +274,7 @@ class CaseManager:
             query = session.query(Evidence).filter(Evidence.case_id == case_id)
             
             if evidence_type:
-                query = query.filter(Evidence.evidence_type == evidence_type)
+                query = query.filter(Evidence.evidence_type == evidence_type.value)  # Use enum value
             
             return query.order_by(desc(Evidence.created_at)).all()
         finally:
@@ -409,14 +408,14 @@ class CaseManager:
             evidence_stats = {}
             for evidence_type in EvidenceType:
                 count = session.query(Evidence).filter(
-                    and_(Evidence.case_id == case_id, Evidence.evidence_type == evidence_type)
+                    and_(Evidence.case_id == case_id, Evidence.evidence_type == evidence_type.value)  # Use enum value
                 ).count()
                 evidence_stats[evidence_type.value] = count
             
             # Processing statistics
             total_evidence = session.query(Evidence).filter(Evidence.case_id == case_id).count()
             processed_evidence = session.query(Evidence).filter(
-                and_(Evidence.case_id == case_id, Evidence.processing_status == ProcessingStatus.COMPLETED)
+                and_(Evidence.case_id == case_id, Evidence.processing_status == ProcessingStatus.COMPLETED.value)  # Use enum value
             ).count()
             
             # Chunk statistics
@@ -429,7 +428,7 @@ class CaseManager:
                     "id": case.id,
                     "case_number": case.case_number,
                     "title": case.title,
-                    "status": case.status.value,
+                    "status": case.status,  # Already a string
                     "created_at": case.created_at,
                     "updated_at": case.updated_at
                 },

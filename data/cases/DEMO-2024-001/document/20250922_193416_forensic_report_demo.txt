@@ -1,0 +1,30 @@
+FORENSIC INVESTIGATION REPORT
+    
+Case: DEMO-2024-001
+Subject: Mobile Device Analysis
+
+CALL LOG ANALYSIS:
+- Outgoing call to +1-555-0123 at 2024-09-15 14:30:00
+- Incoming call from +1-555-0456 at 2024-09-15 15:45:00
+- Missed call from +1-555-0789 at 2024-09-15 16:20:00
+
+MESSAGE ANALYSIS:
+- Text message to +1-555-0123: "Meeting at 7pm"
+- Text message from +1-555-0456: "Documents are ready"
+- Deleted message recovered: "Transfer completed"
+
+CONTACT ANALYSIS:
+- John Smith: +1-555-0123 (Work)
+- Jane Doe: +1-555-0456 (Personal)
+- Unknown Contact: +1-555-0789
+
+GPS LOCATION DATA:
+- 2024-09-15 14:25:00: 40.7128, -74.0060 (New York)
+- 2024-09-15 15:40:00: 40.7589, -73.9851 (Manhattan)
+- 2024-09-15 16:15:00: 40.7505, -73.9934 (Times Square)
+
+FINDINGS:
+- Device was active during the timeframe 14:00-17:00
+- Multiple communications with known contacts
+- Location data shows movement in NYC area
+- No evidence of data tampering detected

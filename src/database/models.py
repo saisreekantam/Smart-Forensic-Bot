@@ -59,7 +59,7 @@ class Case(Base):
     investigator_name = Column(String, nullable=False)
     investigator_id = Column(String)
     department = Column(String)
-    status = Column(Enum(CaseStatus), default=CaseStatus.ACTIVE)
+    status = Column(String, default="active")  # Store case status as string
     
     # Timestamps
     created_at = Column(DateTime, default=func.now())
@@ -102,7 +102,7 @@ class Evidence(Base):
     file_path = Column(String, nullable=False)
     file_size = Column(Integer)  # Size in bytes
     file_hash = Column(String)  # SHA256 hash for integrity
-    evidence_type = Column(Enum(EvidenceType), nullable=False)
+    evidence_type = Column(String, nullable=False)  # Store evidence type as string
     
     # Evidence metadata
     title = Column(String)
@@ -112,7 +112,7 @@ class Evidence(Base):
     chain_of_custody = Column(JSON)  # Chain of custody information
     
     # Processing information
-    processing_status = Column(Enum(ProcessingStatus), default=ProcessingStatus.PENDING)
+    processing_status = Column(String, default="pending")  # Store processing status as string
     processing_error = Column(Text)
     processed_at = Column(DateTime)
     

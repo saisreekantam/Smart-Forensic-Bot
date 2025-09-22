@@ -1,0 +1,44 @@
+
+FORENSIC INVESTIGATION REPORT - DEMO CASE
+==========================================
+
+Case Number: DEMO-2024-001
+Date: September 22, 2025
+Investigator: Detective Johnson
+
+EVIDENCE SUMMARY:
+- Mobile device analysis completed
+- Call logs extracted from device
+- Text messages recovered (including deleted items)
+- GPS location data mapped
+- Contact list analyzed
+
+KEY FINDINGS:
+1. Suspicious communication patterns identified
+2. Multiple contacts with international numbers
+3. GPS data shows visits to unusual locations
+4. Evidence of data tampering attempts
+
+DIGITAL ARTIFACTS:
+- 1,247 text messages (23 deleted/recovered)
+- 456 call log entries
+- 89 contact entries
+- 34 location coordinates
+- 12 installed applications
+
+TECHNICAL DETAILS:
+- Device: iPhone 14 Pro
+- iOS Version: 16.4.1
+- Extraction Method: UFDR (Universal Forensic Data Retrieval)
+- Hash Verification: SHA-256 confirmed
+- Chain of Custody: Maintained
+
+RECOMMENDATIONS:
+- Further investigation of international contacts
+- Analysis of deleted message content
+- Correlation with known criminal databases
+- Timeline reconstruction needed
+
+This is sample evidence data for testing the ForensicAI analysis system.
+It contains various forensic keywords and patterns that should be detected
+by the natural language processing and analysis capabilities.
