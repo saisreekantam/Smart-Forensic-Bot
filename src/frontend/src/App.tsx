@@ -14,6 +14,8 @@ import Analytics from "./pages/Analytics";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import CaseSelection from "./pages/CaseSelection";
+import EvidenceViewer from "./pages/EvidenceViewer";
+import NetworkAnalysis from "./pages/NetworkAnalysis";
 
 const queryClient = new QueryClient();
 
@@ -120,10 +122,7 @@ const App = () => (
                 <SidebarInset>
                   <Header />
                   <main className="flex-1 p-6">
-                    <div className="text-center py-20">
-                      <h2 className="text-2xl font-semibold">Evidence Viewer</h2>
-                      <p className="text-muted-foreground mt-2">Evidence browser coming soon...</p>
-                    </div>
+                    <EvidenceViewer />
                   </main>
                 </SidebarInset>
               </div>
@@ -137,10 +136,7 @@ const App = () => (
                 <SidebarInset>
                   <Header />
                   <main className="flex-1 p-6">
-                    <div className="text-center py-20">
-                      <h2 className="text-2xl font-semibold">Network Analysis</h2>
-                      <p className="text-muted-foreground mt-2">Connection mapping coming soon...</p>
-                    </div>
+                    <NetworkAnalysis />
                   </main>
                 </SidebarInset>
               </div>

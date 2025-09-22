@@ -20,6 +20,9 @@ except ImportError:
     PDF_AVAILABLE = False
     print("PyPDF2 not available - PDF processing disabled")
 
+# Import enum for status values
+from src.database.models import ProcessingStatus
+
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -68,7 +71,7 @@ class SimpleDataProcessor:
                         output_file = self._save_processed_data(evidence, processed_data, case_id)
                         
                         # Update database
-                        self._update_evidence_status(evidence['id'], "COMPLETED", True)
+                        self._update_evidence_status(evidence['id'], ProcessingStatus.COMPLETED.value, True)
                         
                         results["processed_files"].append({
                             "evidence_id": evidence['id'],
@@ -85,7 +88,7 @@ class SimpleDataProcessor:
                     error_msg = f"Failed to process {evidence['original_filename']}: {str(e)}"
                     logger.error(error_msg)
                     results["errors"].append(error_msg)
-                    self._update_evidence_status(evidence['id'], "ERROR", False)
+                    self._update_evidence_status(evidence['id'], ProcessingStatus.FAILED.value, False)
             
             # Update case processing progress
             self._update_case_progress(case_id)
@@ -113,8 +116,8 @@ class SimpleDataProcessor:
             cursor.execute("""
                 SELECT id, original_filename, file_path, evidence_type, processing_status
                 FROM evidence 
-                WHERE case_id = ? AND processing_status = 'PENDING'
-            """, (case_id,))
+                WHERE case_id = ? AND processing_status = ?
+            """, (case_id, ProcessingStatus.PENDING.value))
             
             evidence_files = [dict(row) for row in cursor.fetchall()]
             conn.close()
@@ -619,10 +622,10 @@ class SimpleDataProcessor:
             cursor.execute("""
                 SELECT 
                     COUNT(*) as total,
-                    SUM(CASE WHEN processing_status = 'COMPLETED' THEN 1 ELSE 0 END) as completed
+                    SUM(CASE WHEN processing_status = ? THEN 1 ELSE 0 END) as completed
                 FROM evidence 
                 WHERE case_id = ?
-            """, (case_id,))
+            """, (ProcessingStatus.COMPLETED.value, case_id))
             
             result = cursor.fetchone()
             total, completed = result[0], result[1]

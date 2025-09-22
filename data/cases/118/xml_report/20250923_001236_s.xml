@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UFDRReport>
+  <ReportInfo>
+    <GeneratedBy>Cellebrite UFED</GeneratedBy>
+    <Examiner>John Doe</Examiner>
+    <Agency>Cyber Crime Unit – Hyderabad Police</Agency>
+    <DateOfExtraction>2025-09-22</DateOfExtraction>
+    <ExtractionType>Logical + File System</ExtractionType>
+  </ReportInfo>
+
+  <DeviceInfo>
+    <DeviceName>Samsung Galaxy S21 Ultra</DeviceName>
+    <Model>SM-G998B</Model>
+    <OSVersion>Android 13</OSVersion>
+    <IMEI>352982118276543</IMEI>
+    <SerialNumber>RFCT12345AB</SerialNumber>
+    <SIM>
+      <ICCID>8991101200003204510F</ICCID>
+      <IMSI>404450123456789</IMSI>
+      <Carrier>Airtel</Carrier>
+    </SIM>
+  </DeviceInfo>
+
+  <Contacts total="153">
+    <Contact>
+      <Name>Rahul Sharma</Name>
+      <PhoneNumber>+919876543210</PhoneNumber>
+      <Email>rahul.s@example.com</Email>
+      <Notes>Work</Notes>
+    </Contact>
+    <Contact>
+      <Name>Sneha Reddy</Name>
+      <PhoneNumber>+919123456789</PhoneNumber>
+      <Notes>College</Notes>
+    </Contact>
+  </Contacts>
+
+  <CallLogs total="247">
+    <Call>
+      <DateTime>2025-09-18T14:22:00</DateTime>
+      <Type>Outgoing</Type>
+      <Number>+919123456789</Number>
+      <Duration>192</Duration> <!-- seconds -->
+    </Call>
+    <Call>
+      <DateTime>2025-09-17T21:10:00</DateTime>
+      <Type>Incoming</Type>
+      <Number>+919876543210</Number>
+      <Duration>345</Duration>
+    </Call>
+  </CallLogs>
+
+  <Messages>
+    <SMS>
+      <From>+919876543210</From>
+      <To>Device User</To>
+      <DateTime>2025-09-16T19:30:00</DateTime>
+      <Content>Meeting postponed to tomorrow 11am.</Content>
+    </SMS>
+    <WhatsApp>
+      <ChatWith>Sneha R.</ChatWith>
+      <Message>
+        <DateTime>2025-09-15T22:14:00</DateTime>
+        <Sender>User</Sender>
+        <Content>Reached safely, don’t worry.</Content>
+      </Message>
+      <Message>
+        <DateTime>2025-09-15T22:16:00</DateTime>
+        <Sender>Sneha</Sender>
+        <Content>Ok, keep me updated.</Content>
+      </Message>
+    </WhatsApp>
+  </Messages>
+
+  <Media>
+    <Photo>
+      <Filename>IMG_20250914_193012.jpg</Filename>
+      <DateTaken>2025-09-14T19:30:12</DateTaken>
+      <Location lat="17.3850" lon="78.4867">Hyderabad</Location>
+      <Hash type="MD5">A45F6D3C89B2D1234567ABCDEF09876</Hash>
+    </Photo>
+  </Media>
+
+  <DeletedData>
+    <WhatsAppChat>
+      <Number>+919987654321</Number>
+      <RecoveredMessage>
+        <DateTime>2025-09-10T14:45:00</DateTime>
+        <Content>Payment done. Confirm once received.</Content>
+      </RecoveredMessage>
+    </WhatsAppChat>
+  </DeletedData>
+</UFDRReport>

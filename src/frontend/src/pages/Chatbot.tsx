@@ -135,9 +135,11 @@ const ForensicChatbot = () => {
         const data = await response.json();
         const loadedMessages = data.messages.map((msg: any) => ({
           id: msg.id.toString(),
-          text: msg.message,
+          text: msg.content,  // Use 'content' field from backend
           isUser: msg.role === 'user',
-          timestamp: new Date(msg.timestamp)
+          timestamp: new Date(msg.timestamp),
+          sources: msg.sources || [],
+          confidence: msg.confidence
         }));
         
         if (loadedMessages.length === 0) {
@@ -236,25 +238,6 @@ const ForensicChatbot = () => {
 
     setMessages(prev => [...prev, userMessage]);
     
-    // Save user message to session if we have a current session
-    if (currentSessionId) {
-      try {
-        const selectedCaseId = localStorage.getItem('selectedCaseId');
-        if (selectedCaseId) {
-          await fetch(`http://localhost:8000/cases/${selectedCaseId}/chat/sessions/${currentSessionId}/messages`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              role: 'user',
-              message: inputText
-            })
-          });
-        }
-      } catch (error) {
-        console.error('Error saving user message:', error);
-      }
-    }
-    
     // Update conversation history
     const newHistory = [...conversationHistory, { role: 'user', content: inputText }];
     setConversationHistory(newHistory);
@@ -295,25 +278,6 @@ const ForensicChatbot = () => {
         };
 
         setMessages(prev => [...prev, botMessage]);
-        
-        // Save bot message to session if we have a current session
-        if (currentSessionId) {
-          try {
-            const selectedCaseId = localStorage.getItem('selectedCaseId');
-            if (selectedCaseId) {
-              await fetch(`http://localhost:8000/cases/${selectedCaseId}/chat/sessions/${currentSessionId}/messages`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  role: 'assistant',
-                  message: data.response
-                })
-              });
-            }
-          } catch (error) {
-            console.error('Error saving bot message:', error);
-          }
-        }
         
         // Update conversation history with bot response
         setConversationHistory(prev => [...prev, { role: 'assistant', content: data.response }]);

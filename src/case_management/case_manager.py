@@ -20,7 +20,7 @@ import logging
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_, desc, asc
 
-from database.models import (
+from src.database.models import (
     Case, Evidence, EvidenceChunk, CaseNote,
     EvidenceType, CaseStatus, ProcessingStatus,
     DatabaseManager, db_manager
@@ -297,7 +297,7 @@ class CaseManager:
             if not evidence:
                 return None
             
-            evidence.processing_status = status
+            evidence.processing_status = status.value
             if error:
                 evidence.processing_error = error
             # Note: progress parameter accepted for compatibility but not stored in DB

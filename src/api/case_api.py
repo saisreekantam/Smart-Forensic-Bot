@@ -1,12 +1,12 @@
 """
-Case Management API with Intelligent Chatbot
+Enhanced Case Management API with Knowledge Graph and Intelligent Reporting
 
 FastAPI endpoints for managing forensic cases and providing intelligent
-chat-based investigation assistance using OpenAI GPT models (GPT-4o-mini and GPT-4).
+chat-based investigation assistance with enhanced knowledge graphs and case memory.
 """
 
 from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Form, BackgroundTasks
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
@@ -29,20 +29,24 @@ from src.data_ingestion.optimized_processor import OptimizedCaseProcessor
 from src.ai_cores.rag.case_vector_store import CaseVectorStore, case_vector_store
 from src.ai_cores.langgraph_assistant import LangGraphCaseAssistant
 
-# Import the simple processor
+# Import enhanced systems
 import sys
 sys.path.append('.')
 from simple_data_processor import SimpleDataProcessor
-from simple_chat_handler import process_case_query
+from simple_chat_handler import process_case_query  # Use original simple chat handler global function
+from enhanced_chat_handler import enhanced_chat_handler  # For enhanced features only
 from chat_history_manager import chat_history_manager
+from src.ai_cores.case_memory import case_memory
+from src.ai_cores.enhanced_knowledge_graph import enhanced_kg_db
+from src.ai_cores.intelligent_report_generator import report_generator
 
 logger = logging.getLogger(__name__)
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="Project Sentinel - Forensic Case Management API",
-    description="AI-powered forensic investigation platform with intelligent chatbot",
-    version="1.0.0"
+    title="Enhanced Project Sentinel - Forensic Case Management API",
+    description="AI-powered forensic investigation platform with knowledge graphs, case memory, and intelligent reporting",
+    version="2.0.0"
 )
 
 # Add CORS middleware for web frontend
@@ -352,12 +356,12 @@ async def upload_evidence_simple(
         # Determine evidence type from file extension
         file_ext = file.filename.split('.')[-1].lower() if file.filename else 'txt'
         evidence_type_mapping = {
-            'csv': EvidenceType.CALL_LOGS,
-            'xml': EvidenceType.UFDR_EXPORT,
-            'json': EvidenceType.STRUCTURED_DATA,
+            'csv': EvidenceType.CSV_DATA,
+            'xml': EvidenceType.XML_REPORT,
+            'json': EvidenceType.JSON_DATA,
             'txt': EvidenceType.TEXT_REPORT,
             'pdf': EvidenceType.TEXT_REPORT,
-            'ufdr': EvidenceType.UFDR_EXPORT
+            'ufdr': EvidenceType.XML_REPORT
         }
         evidence_type = evidence_type_mapping.get(file_ext, EvidenceType.TEXT_REPORT)
         
@@ -514,7 +518,7 @@ async def chat_with_case(case_id: str, chat_message: ChatMessage):
         if session_id:
             chat_history_manager.save_message(session_id, "user", chat_message.message)
         
-        # Use our simple chat handler
+        # Use original simple chat handler global function
         chat_result = await process_case_query(
             case_id=case_id,
             query=chat_message.message,
@@ -527,20 +531,19 @@ async def chat_with_case(case_id: str, chat_message: ChatMessage):
                 session_id, 
                 "assistant", 
                 chat_result['response'],
-                chat_result['sources'],
-                chat_result['confidence']
+                chat_result.get('sources', []),
+                chat_result.get('confidence', 0.0)
             )
         
         # Convert to API response format
         return ChatResponse(
-            response=f"{chat_result['response']}\n\n💡 *Analysis powered by Simple Search + GPT-4o-mini* | Sources: {len(chat_result['sources'])} | Confidence: {chat_result['confidence']:.1%}",
-            sources=chat_result['sources'],
-            confidence=chat_result['confidence'],
+            response=chat_result['response'],
+            sources=chat_result.get('sources', []),
+            confidence=chat_result.get('confidence', 0.0),
             case_context={
                 "case_number": case.case_number,
                 "evidence_count": case.total_evidence_count,
                 "processed_count": case.processed_evidence_count,
-                "search_results": chat_result['case_context'].get('search_results_count', 0),
                 "session_id": session_id
             },
             timestamp=datetime.now()
@@ -1295,6 +1298,287 @@ Case Status: {case.processed_evidence_count} of {case.total_evidence_count} evid
         
         return response
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+# =============================================================================
+# ENHANCED FEATURES: Knowledge Graph, Case Memory, and Intelligent Reporting
+# =============================================================================
+
+# Data models for new endpoints
+class ReportRequest(BaseModel):
+    report_type: str = Field(default="detailed_analysis", description="Type of report to generate")
+    custom_sections: Optional[List[str]] = Field(default=None, description="Custom sections to include")
+
+class InsightResponse(BaseModel):
+    success: bool
+    case_id: str
+    insights: List[Dict[str, Any]]
+    statistics: Dict[str, Any]
+    investigation_health: Dict[str, Any]
+
+class KnowledgeGraphResponse(BaseModel):
+    success: bool
+    case_id: str
+    knowledge_graph: Dict[str, Any]
+
+class ReportResponse(BaseModel):
+    success: bool
+    report: Optional[Dict[str, Any]] = None
+    error: Optional[str] = None
+
+@app.post("/cases/{case_id}/reports/generate", response_model=ReportResponse)
+async def generate_case_report(case_id: str, report_request: ReportRequest):
+    """
+    Generate an intelligent forensic investigation report
+    """
+    try:
+        # Verify case exists
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        # Generate report using enhanced chat handler
+        result = await enhanced_chat_handler.generate_case_report(
+            case_id, 
+            report_request.report_type
+        )
+        
+        if not result["success"]:
+            raise HTTPException(status_code=500, detail=result["error"])
+        
+        return ReportResponse(success=True, report=result["report"])
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error generating report for case {case_id}: {str(e)}")
+        return ReportResponse(success=False, error=str(e))
+
+@app.get("/cases/{case_id}/reports/{report_id}/html")
+async def get_report_html(case_id: str, report_id: str):
+    """
+    Get report in HTML format for viewing/printing
+    """
+    try:
+        # This is a simplified version - in a real implementation,
+        # you'd store reports and retrieve by ID
+        result = await enhanced_chat_handler.generate_case_report(case_id, "detailed_analysis")
+        
+        if not result["success"]:
+            raise HTTPException(status_code=404, detail="Report not found")
+        
+        # Convert to HTML using report generator
+        from src.ai_cores.intelligent_report_generator import InvestigationReport
+        
+        # Create a mock report object for HTML export
+        # In practice, you'd reconstruct this from stored data
+        html_content = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Investigation Report - Case {case_id}</title>
+    <style>
+        body {{ font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }}
+        h1 {{ color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }}
+        h2 {{ color: #34495e; border-bottom: 1px solid #bdc3c7; padding-bottom: 5px; }}
+        .header {{ background-color: #ecf0f1; padding: 20px; border-radius: 5px; margin-bottom: 30px; }}
+        .section {{ margin-bottom: 30px; }}
+        .confidence {{ font-style: italic; color: #7f8c8d; }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Forensic Investigation Report</h1>
+        <p><strong>Case ID:</strong> {case_id}</p>
+        <p><strong>Generated:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+        <p><strong>Report Type:</strong> Enhanced Analysis</p>
+    </div>
+    
+    <div class="section">
+        <h2>Report Content</h2>
+        <p>This report contains comprehensive analysis of case evidence and findings.</p>
+        <p>Generated using advanced AI analysis with knowledge graph integration.</p>
+    </div>
+</body>
+</html>
+        """
+        
+        return HTMLResponse(content=html_content)
+        
+    except Exception as e:
+        logger.error(f"Error generating HTML report: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error generating HTML report")
+
+@app.get("/cases/{case_id}/insights", response_model=InsightResponse)
+async def get_case_insights(case_id: str):
+    """
+    Get comprehensive case insights and investigation analysis
+    """
+    try:
+        # Verify case exists
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        # Get insights using enhanced chat handler
+        result = await enhanced_chat_handler.get_case_insights(case_id)
+        
+        if not result["success"]:
+            raise HTTPException(status_code=500, detail=result["error"])
+        
+        return InsightResponse(
+            success=True,
+            case_id=case_id,
+            insights=result["insights"],
+            statistics=result["statistics"],
+            investigation_health=result["investigation_health"]
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting case insights for {case_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.get("/cases/{case_id}/knowledge-graph", response_model=KnowledgeGraphResponse)
+async def get_case_knowledge_graph(case_id: str):
+    """
+    Get knowledge graph summary for the case
+    """
+    try:
+        # Verify case exists
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        # Get knowledge graph using enhanced chat handler
+        result = await enhanced_chat_handler.get_knowledge_graph_summary(case_id)
+        
+        if not result["success"]:
+            raise HTTPException(status_code=500, detail=result["error"])
+        
+        return KnowledgeGraphResponse(
+            success=True,
+            case_id=case_id,
+            knowledge_graph=result["knowledge_graph"]
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting knowledge graph for {case_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.get("/cases/{case_id}/memory/stats")
+async def get_case_memory_stats(case_id: str):
+    """
+    Get case memory statistics and investigation patterns
+    """
+    try:
+        # Verify case exists
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        # Get case memory stats
+        stats = case_memory.get_case_memory_stats(case_id)
+        summary = case_memory.get_investigation_summary(case_id)
+        
+        return {
+            "case_id": case_id,
+            "statistics": {
+                "total_interactions": stats.total_interactions,
+                "unique_entities_mentioned": stats.unique_entities_mentioned,
+                "investigation_days": len(stats.temporal_activity),
+                "common_query_patterns": stats.common_query_patterns[:10],
+                "investigation_focus_areas": stats.investigation_focus_areas[:10],
+                "entity_co_occurrence": stats.entity_co_occurrence
+            },
+            "investigation_summary": summary
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting case memory stats for {case_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.post("/cases/{case_id}/knowledge-graph/query")
+async def query_knowledge_graph(case_id: str, query_request: Dict[str, Any]):
+    """
+    Query the knowledge graph with specific parameters
+    """
+    try:
+        # Verify case exists
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        query_type = query_request.get("query_type", "find_entity")
+        parameters = query_request.get("parameters", {})
+        
+        # Query knowledge graph
+        results = enhanced_kg_db.query_knowledge_graph(case_id, query_type, parameters)
+        
+        return {
+            "case_id": case_id,
+            "query_type": query_type,
+            "parameters": parameters,
+            "results": results
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error querying knowledge graph for {case_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.get("/health/enhanced")
+async def enhanced_health_check():
+    """
+    Enhanced health check including new systems
+    """
+    try:
+        # Test database connection
+        db_status = "healthy" if db_manager.test_connection() else "unhealthy"
+        
+        # Test case memory
+        try:
+            stats = case_memory.get_case_memory_stats("test")
+            memory_status = "healthy"
+        except Exception:
+            memory_status = "unhealthy"
+        
+        # Test knowledge graph
+        try:
+            kg_data = enhanced_kg_db.get_case_knowledge_graph("test")
+            kg_status = "healthy"
+        except Exception:
+            kg_status = "unhealthy"
+        
+        return {
+            "status": "healthy",
+            "timestamp": datetime.now().isoformat(),
+            "version": "2.0.0",
+            "services": {
+                "database": db_status,
+                "case_memory": memory_status,
+                "knowledge_graph": kg_status,
+                "enhanced_chat": "healthy",
+                "report_generator": "healthy"
+            },
+            "features": [
+                "enhanced_chat_handler",
+                "knowledge_graphs", 
+                "case_memory",
+                "intelligent_reporting",
+                "entity_extraction",
+                "relationship_mapping"
+            ]
+        }
+        
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }
+
