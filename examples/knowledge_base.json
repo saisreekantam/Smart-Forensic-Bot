@@ -1,0 +1,52 @@
+[
+  {
+    "content": "Portable Executable (PE) files are the native file format for Windows executables. When analyzing PE files, look for indicators such as unusual entry points, packed sections, suspicious imports, and digital signature verification.",
+    "category": "file_analysis",
+    "source": "forensic_handbook"
+  },
+  {
+    "content": "Registry artifacts can provide valuable information about system configuration, user activity, and malware persistence. Key registry locations include Run keys, Services, and Recently Used items.",
+    "category": "windows_forensics",
+    "source": "forensic_handbook"
+  },
+  {
+    "content": "Network forensics involves analyzing network traffic to identify suspicious communications, data exfiltration, and command and control channels. Look for unusual protocols, destinations, and traffic patterns.",
+    "category": "network_forensics",
+    "source": "forensic_handbook"
+  },
+  {
+    "content": "File system timestamps (MAC times) provide crucial timeline information. However, be aware that timestamps can be modified by attackers to hide their activities.",
+    "category": "timeline_analysis",
+    "source": "forensic_handbook"
+  },
+  {
+    "content": "Memory forensics can reveal running processes, network connections, and artifacts that may not be present on disk. Tools like Volatility are essential for memory analysis.",
+    "category": "memory_forensics",
+    "source": "forensic_handbook"
+  },
+  {
+    "content": "Log file analysis is crucial for understanding system events and user activities. Windows Event Logs, web server logs, and application logs can provide valuable forensic evidence.",
+    "category": "log_analysis",
+    "source": "forensic_handbook"
+  },
+  {
+    "content": "Hash values (MD5, SHA1, SHA256) are used to verify file integrity and identify known malicious files. Compare hashes against threat intelligence databases.",
+    "category": "file_analysis",
+    "source": "forensic_handbook"
+  },
+  {
+    "content": "Browser forensics can reveal user browsing history, downloads, cached files, and stored credentials. Different browsers store data in different locations and formats.",
+    "category": "browser_forensics",
+    "source": "forensic_handbook"
+  },
+  {
+    "content": "Email forensics involves analyzing email headers, attachments, and metadata to trace communication patterns and identify potential security incidents.",
+    "category": "email_forensics",
+    "source": "forensic_handbook"
+  },
+  {
+    "content": "Mobile device forensics requires specialized tools and techniques due to encryption, varied operating systems, and unique data storage methods.",
+    "category": "mobile_forensics",
+    "source": "forensic_handbook"
+  }
+]

@@ -1,0 +1,78 @@
+{
+  "case_id": "DEMO_CASE_20250922_130207",
+  "analyst": "Demo Analyst",
+  "timestamp": "2025-09-22T13:02:07.473656",
+  "summary": {
+    "files_analyzed": 4,
+    "suspicious_files": 2,
+    "knowledge_items": 3
+  },
+  "findings": [
+    "Suspicious file detected: suspicious.bat - Potentially executable file: .bat",
+    "Suspicious file detected: empty.log - Zero-byte file"
+  ],
+  "recommendations": [
+    "Review batch files for malicious commands",
+    "Investigate zero-byte files for potential evidence tampering",
+    "Verify file integrity using hash values",
+    "Preserve original evidence for legal proceedings"
+  ],
+  "detailed_analysis": [
+    {
+      "file_name": "sample.txt",
+      "file_path": "test_evidence/sample.txt",
+      "file_size": 39,
+      "file_extension": ".txt",
+      "created_time": "2025-09-22T13:02:07.471723",
+      "modified_time": "2025-09-22T13:02:07.471723",
+      "hashes": {
+        "md5": "8b948904f85c872e573762767575e44f",
+        "sha256": "a5e43a1f3da88472ce9892f1f479c55f2d80132fadd048ebca0541d1e8331884"
+      },
+      "suspicious_indicators": []
+    },
+    {
+      "file_name": "suspicious.bat",
+      "file_path": "test_evidence/suspicious.bat",
+      "file_size": 46,
+      "file_extension": ".bat",
+      "created_time": "2025-09-22T13:02:07.472723",
+      "modified_time": "2025-09-22T13:02:07.472723",
+      "hashes": {
+        "md5": "3510f8588b06e8ccdcb2113e3e466276",
+        "sha256": "900610f83b930463041f405311c9d14d9234f1ded19a92168f0188194f7f73d1"
+      },
+      "suspicious_indicators": [
+        "Potentially executable file: .bat"
+      ]
+    },
+    {
+      "file_name": "empty.log",
+      "file_path": "test_evidence/empty.log",
+      "file_size": 0,
+      "file_extension": ".log",
+      "created_time": "2025-09-22T13:02:07.472723",
+      "modified_time": "2025-09-22T13:02:07.472723",
+      "hashes": {
+        "md5": "d41d8cd98f00b204e9800998ecf8427e",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "suspicious_indicators": [
+        "Zero-byte file"
+      ]
+    },
+    {
+      "file_name": "data.json",
+      "file_path": "test_evidence/data.json",
+      "file_size": 43,
+      "file_extension": ".json",
+      "created_time": "2025-09-22T13:02:07.472723",
+      "modified_time": "2025-09-22T13:02:07.472723",
+      "hashes": {
+        "md5": "19d77fa3b1c2f51f2d3f1ac275f02757",
+        "sha256": "c87458ca4d82cfd51d572e1ecb86f1f2d1754baa2975d5f126f7cfc97b092d40"
+      },
+      "suspicious_indicators": []
+    }
+  ]
+}
