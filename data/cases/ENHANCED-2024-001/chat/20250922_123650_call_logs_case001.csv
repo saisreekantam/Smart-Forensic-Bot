@@ -1,0 +1,21 @@
+timestamp,direction,phone_number,duration,status,location_lat,location_lng,contact_name
+2024-01-08 09:15:22,outgoing,+1-555-0987,187,answered,42.3601,-71.0589,Alex Rivera
+2024-01-08 14:30:15,incoming,+44-7911-123456,234,answered,42.3580,-71.0636,M. Thompson
+2024-01-08 18:45:33,outgoing,+1-555-2468,156,answered,42.3587,-71.0567,Jane Smith
+2024-01-09 10:22:11,incoming,+1-555-0987,298,answered,42.3601,-71.0589,Alex Rivera
+2024-01-09 16:17:45,outgoing,+44-7911-123456,89,answered,42.3580,-71.0636,M. Thompson
+2024-01-09 20:33:28,incoming,+1-555-7890,67,answered,42.3587,-71.0567,Warehouse Manager
+2024-01-10 08:55:12,outgoing,+1-555-2468,145,answered,42.3601,-71.0589,Jane Smith
+2024-01-10 11:22:00,outgoing,+1-555-0987,234,answered,42.3601,-71.0589,Alex Rivera
+2024-01-10 15:44:33,incoming,unknown,0,missed,42.3580,-71.0636,
+2024-01-10 19:15:00,incoming,+44-7911-123456,156,answered,42.3580,-71.0636,M. Thompson
+2024-01-11 07:30:45,outgoing,+1-555-2468,223,answered,42.3601,-71.0589,Jane Smith
+2024-01-11 12:18:22,incoming,+1-555-0987,178,answered,42.3587,-71.0567,Alex Rivera
+2024-01-11 17:25:55,outgoing,+44-7911-123456,134,answered,42.3580,-71.0636,M. Thompson
+2024-01-11 22:30:00,outgoing,+1-555-2468,89,answered,42.3587,-71.0567,Jane Smith
+2024-01-12 06:45:33,incoming,+1-555-7890,245,answered,42.3601,-71.0589,Warehouse Manager
+2024-01-12 08:45:00,incoming,unknown,12,missed,42.3601,-71.0589,
+2024-01-12 13:22:11,outgoing,+1-555-0987,167,answered,42.3580,-71.0636,Alex Rivera
+2024-01-12 16:55:44,incoming,+44-7911-123456,203,answered,42.3587,-71.0567,M. Thompson
+2024-01-12 21:33:17,outgoing,+1-555-2468,156,answered,42.3601,-71.0589,Jane Smith
+2024-01-13 09:12:00,incoming,+1-555-0987,289,answered,42.3580,-71.0636,Alex Rivera

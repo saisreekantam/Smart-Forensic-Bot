@@ -1,0 +1,136 @@
+CASE ID: CASE-2024-002
+DEVICE: iPhone 14 Pro
+IMEI: 987654321098765
+EXAMINATION DATE: 2024-01-16
+
+=== COMMUNICATIONS LOG ===
+
+WhatsApp Messages:
+[2024-01-13 14:30] Contact Name: Sarah Mitchell (+1-555-1234)
+Message: "The new supplier from overseas wants to meet next week. Can you arrange the introduction?"
+
+[2024-01-13 14:32] Device Owner: 
+Message: "Sure, I'll set up the meeting. Same location as last time?"
+
+[2024-01-13 14:35] Contact Name: Sarah Mitchell
+Message: "No, they want something more private. How about the parking garage at coordinates 40.7589° N, 73.9851° W?"
+
+[2024-01-13 16:45] Contact Name: Mike Rodriguez (+34-612-345-678)
+Message: "Package from Madrid ready for shipment. Value: €75,000. Need confirmation of receiving party."
+
+[2024-01-13 16:47] Device Owner:
+Message: "Confirmed. Send to the usual intermediary. They'll handle distribution."
+
+[2024-01-13 16:50] Contact Name: Mike Rodriguez
+Message: "Roger that. Tracking number: ES123456789. ETA: Friday morning."
+
+Signal Messages:
+[2024-01-14 09:22] Contact Name: A. Chen (+86-138-0013-8000)
+Message: "Manufacturing complete. 500 units ready for export. Need payment confirmation."
+
+[2024-01-14 09:25] Device Owner:
+Message: "Payment sent to IBAN: DE89370400440532013000. Check your account."
+
+[2024-01-14 09:30] Contact Name: A. Chen
+Message: "Payment received. Shipping manifest attached. Customs code: HS-847330"
+
+Telegram Messages:
+[2024-01-14 18:15] Contact Name: QuantumTrader
+Message: "Market volatility creating opportunities. Transfer 100k to Ethereum address: 0x742d35Cc6Bf8f8f54a8B4E1d5B1b8b4E4E4E4E4E"
+
+[2024-01-14 18:18] Device Owner:
+Message: "Transfer initiated. Confirm receipt in 2 hours. Need this to clear before Friday."
+
+[2024-01-14 20:22] Contact Name: QuantumTrader  
+Message: "Confirmed. 100k received. Your portfolio now valued at $2.3M. Next move?"
+
+=== CALL LOGS ===
+
+2024-01-13 15:22 - Outgoing call to +1-555-1234 (Sarah Mitchell) - Duration: 8:45
+2024-01-13 17:33 - Incoming call from +34-612-345-678 (Mike Rodriguez) - Duration: 12:30
+2024-01-14 10:15 - Outgoing call to +86-138-0013-8000 (A. Chen) - Duration: 15:22
+2024-01-14 19:45 - Incoming call from +1-555-9999 (Unknown) - Duration: 0:05 (Missed)
+2024-01-15 08:30 - Outgoing call to +44-7700-900123 (London Office) - Duration: 22:15
+
+=== CONTACT LIST ===
+
+Sarah Mitchell
+Phone: +1-555-1234
+Email: s.mitchell@globalcorp.com
+Organization: Global Imports LLC
+Notes: Primary US distributor
+
+Mike Rodriguez  
+Phone: +34-612-345-678
+Email: m.rodriguez@iberialogistics.es
+Organization: Iberia Logistics
+Notes: European supplier and shipper
+
+A. Chen
+Phone: +86-138-0013-8000
+Email: manufacturing@dragontech.cn
+Organization: DragonTech Manufacturing
+Notes: Asian production facility
+
+London Office
+Phone: +44-7700-900123
+Email: operations@eurolink.co.uk
+Organization: EuroLink Operations
+Notes: European headquarters
+
+QuantumTrader
+Phone: Not available
+Email: quantum@protonmail.com
+Organization: Independent Financial Advisor
+Notes: Cryptocurrency and offshore investments
+
+=== FINANCIAL INFORMATION ===
+
+Bank Accounts:
+- Account: DE89370400440532013000 (Deutsche Bank)
+- Account: 123456789 (Cayman International Bank)
+- Account: CH9300762011623852957 (Credit Suisse)
+
+Cryptocurrency Wallets:
+- Bitcoin: 3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy (Balance: 15.7 BTC)
+- Ethereum: 0x742d35Cc6Bf8f8f54a8B4E1d5B1b8b4E4E4E4E4E (Balance: 250 ETH)
+- Monero: 4AdUndXHHZ6cfufTMvppY6JwXNouMBzSkbLYfpAV5Usx3skxNgYeYTRJ5MNvC65XA3xP4qnH9jWkWfz1s9qE2G9
+
+=== APPLICATIONS DATA ===
+
+Installed Apps:
+- WhatsApp Business (Version 2.23.25.76) - Last used: 2024-01-15 09:30
+- Signal (Version 6.43.1) - Last used: 2024-01-14 09:35  
+- Telegram (Version 10.2.6) - Last used: 2024-01-14 20:25
+- Coinbase Wallet (Version 8.15.2) - Last used: 2024-01-14 18:45
+- Binance (Version 2.65.0) - Last used: 2024-01-14 19:15
+- ProtonMail (Version 4.0.15) - Last used: 2024-01-15 08:45
+
+Web History (Last 48 hours):
+- blockchain.info (Multiple visits)
+- coinmarketcap.com
+- xe.com (Currency converter)
+- dhl.com/tracking
+- globalshipping.net
+- caymanbankingservices.com
+
+=== LOCATION DATA ===
+
+Recent Locations:
+2024-01-13 14:30 - 40.7614° N, 73.9776° W (Manhattan, New York)
+2024-01-13 23:45 - 40.7589° N, 73.9851° W (Underground parking garage)
+2024-01-14 08:15 - 40.7614° N, 73.9776° W (Manhattan office building)
+2024-01-14 18:30 - 40.7505° N, 73.9934° W (Financial District)
+2024-01-15 09:00 - 40.7614° N, 73.9776° W (Current location)
+
+=== NOTES ===
+
+Device shows evidence of sophisticated international operation involving:
+- Multi-national suppliers and distributors
+- Significant cryptocurrency transactions
+- Offshore banking relationships  
+- Encrypted communication channels
+- Coordinated logistics across multiple time zones
+
+Investigation Priority: HIGH
+Recommended Actions: Monitor all associated phone numbers, track cryptocurrency addresses, coordinate with international law enforcement

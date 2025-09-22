@@ -1,0 +1,33 @@
+timestamp,app,sender,recipient,message_content,status,direction
+2024-01-08 10:30:15,WhatsApp,+1-555-0987,+1-555-0123,"Initial contact established. Ready to proceed with the arrangement we discussed.",read,incoming
+2024-01-08 10:32:22,WhatsApp,+1-555-0123,+1-555-0987,"Good. I've prepared the first installment. When can we move forward?",delivered,outgoing
+2024-01-08 14:45:33,Signal,+44-7911-123456,+1-555-0123,"The overseas connection confirms everything is on schedule. Proceed as planned.",read,incoming
+2024-01-08 14:47:11,Signal,+1-555-0123,+44-7911-123456,"Understood. Will coordinate with local team for the handoff.",read,outgoing
+2024-01-08 18:22:44,Telegram,jane.smith@protonmail.com,+1-555-0123,"Logistics update: All transportation arrangements confirmed for this week.",read,incoming
+2024-01-08 18:25:17,SMS,+1-555-0123,+1-555-2468,"Jane confirms transport ready. Are your people in position?",delivered,outgoing
+2024-01-09 09:15:33,WhatsApp,+1-555-0987,+1-555-0123,"Change of plans. The delivery location has been moved to building 7 in the warehouse district.",read,incoming
+2024-01-09 09:18:45,WhatsApp,+1-555-0123,+1-555-0987,"Building 7 confirmed. Same time as originally planned?",delivered,outgoing
+2024-01-09 09:20:12,WhatsApp,+1-555-0987,+1-555-0123,"Yes, 11 PM sharp. Make sure you're not followed.",read,incoming
+2024-01-09 15:30:22,Signal,+44-7911-123456,+1-555-0123,"Security protocols have been updated. Use the new authentication phrase: 'Evening Rain'",read,incoming
+2024-01-09 15:32:55,Signal,+1-555-0123,+44-7911-123456,"Authentication phrase received: 'Evening Rain'. Will use it for all upcoming contacts.",read,outgoing
+2024-01-09 20:45:11,Telegram,jane.smith@protonmail.com,+1-555-0123,"Final check: Vehicle registration XYZ-4567 will be used for transport. License plate verified.",read,incoming
+2024-01-10 08:22:33,WhatsApp,+1-555-0123,+1-555-0987,"Payment ready. Crypto wallet address: 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa. Confirm receipt.",delivered,outgoing
+2024-01-10 08:25:44,WhatsApp,+1-555-0987,+1-555-0123,"Wallet address confirmed. Transfer 50000 USD equivalent in BTC. Transaction must be completed before meeting.",read,incoming
+2024-01-10 15:30:00,WhatsApp,+1-555-0987,+1-555-0123,"The package will arrive tonight at the usual location. Be ready at 11 PM.",read,incoming
+2024-01-10 15:32:00,WhatsApp,+1-555-0123,+1-555-0987,"Understood. Will have the 50k ready in crypto. Same wallet as before?",delivered,outgoing
+2024-01-10 15:35:00,WhatsApp,+1-555-0987,+1-555-0123,"Yes, send to 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa. Make sure no trace.",read,incoming
+2024-01-10 20:45:00,WhatsApp,+1-555-0123,+1-555-0987,"Transaction complete. Check your wallet. When do we meet for phase 2?",delivered,outgoing
+2024-01-10 23:15:22,Signal,+44-7911-123456,+1-555-0123,"Phase 1 completed successfully. Boss is pleased. Phase 2 details will follow.",read,incoming
+2024-01-11 09:15:00,Signal,+44-7911-123456,+1-555-0123,"Boss wants to meet Friday. Location: 42.3601° N, 71.0589° W. Come alone.",read,incoming
+2024-01-11 09:18:00,Signal,+1-555-0123,+44-7911-123456,"Understood. Will be there at the usual time. Should I bring the documents from the previous operation?",read,outgoing
+2024-01-11 09:22:33,Signal,+44-7911-123456,+1-555-0123,"Bring everything. This is the final review before we expand operations to the west coast.",read,incoming
+2024-01-11 14:30:45,Telegram,jane.smith@protonmail.com,+1-555-0123,"New development: Additional security measures required. All future communications through encrypted channels only.",read,incoming
+2024-01-11 14:33:22,SMS,+1-555-0123,+1-555-2468,"Jane says encryption only from now on. Download the new app she mentioned.",delivered,outgoing
+2024-01-12 07:45:11,WhatsApp,+1-555-0987,+1-555-0123,"Change in schedule. The international shipment has been delayed by 72 hours.",read,incoming
+2024-01-12 07:47:33,WhatsApp,+1-555-0123,+1-555-0987,"Delay noted. Does this affect our Friday meeting with the boss?",delivered,outgoing
+2024-01-12 07:50:22,WhatsApp,+1-555-0987,+1-555-0123,"Friday meeting still on. This delay is for the larger operation next week.",read,incoming
+2024-01-12 14:22:00,Telegram,jane.smith@protonmail.com,+1-555-0123,"The shipment from overseas has been delayed. New ETA is next Tuesday. Inform the others.",read,incoming
+2024-01-12 16:30:00,SMS,+1-555-0123,+1-555-2468,"Meeting postponed. Jane says Tuesday now. Meet at the warehouse district, building 7.",delivered,outgoing
+2024-01-12 18:45:33,Signal,+44-7911-123456,+1-555-0123,"Confirming Friday 6 PM. Bring financial records and the contact list for west coast expansion.",read,incoming
+2024-01-12 18:47:55,Signal,+1-555-0123,+44-7911-123456,"All documents prepared. Will include the bank account information: Account 987654321, Bank of International Commerce.",read,outgoing
+2024-01-13 08:30:22,WhatsApp,+1-555-0987,+1-555-0123,"Final confirmation: Tuesday delivery at building 7. Contact warehouse manager at +1-555-7890 for access codes.",read,incoming

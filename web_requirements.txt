@@ -1,0 +1,15 @@
+# Project Sentinel - Additional Web Interface Requirements
+# Add these to your existing requirements.txt or install separately
+
+# Web Interface
+streamlit>=1.28.0
+requests>=2.31.0
+
+# Data Visualization  
+pandas>=2.0.0
+plotly>=5.15.0
+altair>=5.0.0
+
+# Additional utilities for web interface
+python-multipart>=0.0.6
+aiofiles>=23.0.0

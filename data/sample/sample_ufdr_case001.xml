@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ufdr_report>
+    <case>
+        <id>CASE-2024-001</id>
+        <investigating_officer>Detective Sarah Johnson</investigating_officer>
+        <date_created>2024-01-15T10:30:00Z</date_created>
+        <case_title>Operation Digital Trail</case_title>
+    </case>
+    
+    <device>
+        <make>Samsung</make>
+        <model>Galaxy S23</model>
+        <imei>123456789012345</imei>
+        <serial_number>RZ8W8023456</serial_number>
+        <phone_number>+1-555-0123</phone_number>
+        <os_version>Android 13</os_version>
+        <extraction_date>2024-01-14T14:22:00Z</extraction_date>
+        <extraction_method>Physical</extraction_method>
+    </device>
+    
+    <communications>
+        <messages>
+            <message>
+                <id>msg_001</id>
+                <timestamp>2024-01-10T15:30:00Z</timestamp>
+                <direction>incoming</direction>
+                <sender>+1-555-0987</sender>
+                <recipient>+1-555-0123</recipient>
+                <content>The package will arrive tonight at the usual location. Be ready at 11 PM.</content>
+                <app>WhatsApp</app>
+                <status>read</status>
+            </message>
+            <message>
+                <id>msg_002</id>
+                <timestamp>2024-01-10T15:32:00Z</timestamp>
+                <direction>outgoing</direction>
+                <sender>+1-555-0123</sender>
+                <recipient>+1-555-0987</recipient>
+                <content>Understood. Will have the 50k ready in crypto. Same wallet as before?</content>
+                <app>WhatsApp</app>
+                <status>delivered</status>
+            </message>
+            <message>
+                <id>msg_003</id>
+                <timestamp>2024-01-10T15:35:00Z</timestamp>
+                <direction>incoming</direction>
+                <sender>+1-555-0987</sender>
+                <recipient>+1-555-0123</recipient>
+                <content>Yes, send to 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa. Make sure no trace.</content>
+                <app>WhatsApp</app>
+                <status>read</status>
+            </message>
+            <message>
+                <id>msg_004</id>
+                <timestamp>2024-01-10T20:45:00Z</timestamp>
+                <direction>outgoing</direction>
+                <sender>+1-555-0123</sender>
+                <recipient>+1-555-0987</recipient>
+                <content>Transaction complete. Check your wallet. When do we meet for phase 2?</content>
+                <app>WhatsApp</app>
+                <status>delivered</status>
+            </message>
+            <message>
+                <id>msg_005</id>
+                <timestamp>2024-01-11T09:15:00Z</timestamp>
+                <direction>incoming</direction>
+                <sender>+44-7911-123456</sender>
+                <recipient>+1-555-0123</recipient>
+                <content>Boss wants to meet Friday. Location: 42.3601° N, 71.0589° W. Come alone.</content>
+                <app>Signal</app>
+                <status>read</status>
+            </message>
+            <message>
+                <id>msg_006</id>
+                <timestamp>2024-01-11T09:18:00Z</timestamp>
+                <direction>outgoing</direction>
+                <sender>+1-555-0123</sender>
+                <recipient>+44-7911-123456</recipient>
+                <content>Understood. Will be there at the usual time. Should I bring the documents from the previous operation?</content>
+                <app>Signal</app>
+                <status>read</status>
+            </message>
+            <message>
+                <id>msg_007</id>
+                <timestamp>2024-01-12T14:22:00Z</timestamp>
+                <direction>incoming</direction>
+                <sender>jane.smith@protonmail.com</sender>
+                <recipient>+1-555-0123</recipient>
+                <content>The shipment from overseas has been delayed. New ETA is next Tuesday. Inform the others.</content>
+                <app>Telegram</app>
+                <status>read</status>
+            </message>
+            <message>
+                <id>msg_008</id>
+                <timestamp>2024-01-12T16:30:00Z</timestamp>
+                <direction>outgoing</direction>
+                <sender>+1-555-0123</sender>
+                <recipient>+1-555-2468</recipient>
+                <content>Meeting postponed. Jane says Tuesday now. Meet at the warehouse district, building 7.</content>
+                <app>SMS</app>
+                <status>delivered</status>
+            </message>
+        </messages>
+    </communications>
+    
+    <calls>
+        <call>
+            <id>call_001</id>
+            <timestamp>2024-01-10T11:22:00Z</timestamp>
+            <direction>outgoing</direction>
+            <number>+1-555-0987</number>
+            <duration>234</duration>
+            <status>answered</status>
+            <location>42.3601,-71.0589</location>
+        </call>
+        <call>
+            <id>call_002</id>
+            <timestamp>2024-01-10T19:15:00Z</timestamp>
+            <direction>incoming</direction>
+            <number>+44-7911-123456</number>
+            <duration>156</duration>
+            <status>answered</status>
+            <location>42.3580,-71.0636</location>
+        </call>
+        <call>
+            <id>call_003</id>
+            <timestamp>2024-01-11T22:30:00Z</timestamp>
+            <direction>outgoing</direction>
+            <number>+1-555-2468</number>
+            <duration>89</duration>
+            <status>answered</status>
+            <location>42.3587,-71.0567</location>
+        </call>
+        <call>
+            <id>call_004</id>
+            <timestamp>2024-01-12T08:45:00Z</timestamp>
+            <direction>incoming</direction>
+            <number>unknown</number>
+            <duration>12</duration>
+            <status>missed</status>
+            <location>42.3601,-71.0589</location>
+        </call>
+    </calls>
+    
+    <contacts>
+        <contact>
+            <id>contact_001</id>
+            <name>Alex Rivera</name>
+            <phone_number>+1-555-0987</phone_number>
+            <email>alex.r.crypto@tutanota.com</email>
+            <notes>Primary contact for eastern operations</notes>
+        </contact>
+        <contact>
+            <id>contact_002</id>
+            <name>M. Thompson</name>
+            <phone_number>+44-7911-123456</phone_number>
+            <email></email>
+            <notes>London connection</notes>
+        </contact>
+        <contact>
+            <id>contact_003</id>
+            <name>Jane Smith</name>
+            <phone_number>+1-555-2468</phone_number>
+            <email>jane.smith@protonmail.com</email>
+            <notes>Logistics coordinator</notes>
+        </contact>
+        <contact>
+            <id>contact_004</id>
+            <name>Warehouse Manager</name>
+            <phone_number>+1-555-7890</phone_number>
+            <email>warehouse@darkcorp.onion</email>
+            <notes>Building 7 access</notes>
+        </contact>
+    </contacts>
+    
+    <media_files>
+        <file>
+            <id>media_001</id>
+            <filename>meeting_location.jpg</filename>
+            <path>/data/images/meeting_location.jpg</path>
+            <timestamp>2024-01-11T14:30:00Z</timestamp>
+            <file_size>2048576</file_size>
+            <description>Photo of warehouse district building</description>
+            <gps_coordinates>42.3587,-71.0567</gps_coordinates>
+        </file>
+        <file>
+            <id>media_002</id>
+            <filename>crypto_wallet_screenshot.png</filename>
+            <path>/data/images/crypto_wallet_screenshot.png</path>
+            <timestamp>2024-01-10T20:50:00Z</timestamp>
+            <file_size>1024000</file_size>
+            <description>Screenshot showing Bitcoin transaction confirmation</description>
+        </file>
+        <file>
+            <id>media_003</id>
+            <filename>voice_note_001.ogg</filename>
+            <path>/data/audio/voice_note_001.ogg</path>
+            <timestamp>2024-01-12T18:22:00Z</timestamp>
+            <file_size>3072000</file_size>
+            <description>Voice message discussing operational security</description>
+            <duration>45</duration>
+        </file>
+    </media_files>
+    
+    <applications>
+        <app>
+            <name>WhatsApp</name>
+            <version>2.23.24.76</version>
+            <install_date>2023-08-15T12:00:00Z</install_date>
+            <last_used>2024-01-12T16:45:00Z</last_used>
+        </app>
+        <app>
+            <name>Signal</name>
+            <version>6.42.2</version>
+            <install_date>2023-09-20T14:30:00Z</install_date>
+            <last_used>2024-01-11T09:20:00Z</last_used>
+        </app>
+        <app>
+            <name>Telegram</name>
+            <version>10.2.5</version>
+            <install_date>2023-10-10T16:15:00Z</install_date>
+            <last_used>2024-01-12T14:25:00Z</last_used>
+        </app>
+        <app>
+            <name>Bitcoin Wallet</name>
+            <version>8.4.1</version>
+            <install_date>2023-11-01T10:45:00Z</install_date>
+            <last_used>2024-01-10T20:48:00Z</last_used>
+        </app>
+    </applications>
+    
+    <location_data>
+        <location>
+            <timestamp>2024-01-10T15:30:00Z</timestamp>
+            <latitude>42.3601</latitude>
+            <longitude>-71.0589</longitude>
+            <accuracy>5</accuracy>
+            <address>Downtown Boston, MA</address>
+        </location>
+        <location>
+            <timestamp>2024-01-10T23:00:00Z</timestamp>
+            <latitude>42.3587</latitude>
+            <longitude>-71.0567</longitude>
+            <accuracy>8</accuracy>
+            <address>Warehouse District, Boston, MA</address>
+        </location>
+        <location>
+            <timestamp>2024-01-11T09:15:00Z</timestamp>
+            <latitude>42.3580</latitude>
+            <longitude>-71.0636</longitude>
+            <accuracy>12</accuracy>
+            <address>Financial District, Boston, MA</address>
+        </location>
+    </location_data>
+</ufdr_report>

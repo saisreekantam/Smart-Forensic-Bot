@@ -1,0 +1,133 @@
+{
+  "case_id": "CASE-2024-001",
+  "device": {
+    "make": "Samsung",
+    "model": "Galaxy S23",
+    "imei": "123456789012345",
+    "phone_number": "+1-555-0123",
+    "os": "Android 13"
+  },
+  "extraction_info": {
+    "date": "2024-01-14T14:22:00Z",
+    "method": "Physical",
+    "tools_used": ["Cellebrite UFED", "Oxygen Detective Suite"],
+    "examiner": "Detective Sarah Johnson"
+  },
+  "messages": [
+    {
+      "timestamp": "2024-01-10T15:30:00Z",
+      "app": "WhatsApp",
+      "direction": "incoming",
+      "from": "+1-555-0987",
+      "to": "+1-555-0123",
+      "content": "The package will arrive tonight at the usual location. Be ready at 11 PM.",
+      "status": "read"
+    },
+    {
+      "timestamp": "2024-01-10T15:32:00Z",
+      "app": "WhatsApp", 
+      "direction": "outgoing",
+      "from": "+1-555-0123",
+      "to": "+1-555-0987",
+      "content": "Understood. Will have the 50k ready in crypto. Same wallet as before?",
+      "status": "delivered"
+    },
+    {
+      "timestamp": "2024-01-10T15:35:00Z",
+      "app": "WhatsApp",
+      "direction": "incoming", 
+      "from": "+1-555-0987",
+      "to": "+1-555-0123",
+      "content": "Yes, send to 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa. Make sure no trace.",
+      "status": "read"
+    }
+  ],
+  "calls": [
+    {
+      "timestamp": "2024-01-10T11:22:00Z",
+      "direction": "outgoing",
+      "number": "+1-555-0987",
+      "duration": 234,
+      "status": "answered"
+    },
+    {
+      "timestamp": "2024-01-10T19:15:00Z", 
+      "direction": "incoming",
+      "number": "+44-7911-123456",
+      "duration": 156,
+      "status": "answered"
+    }
+  ],
+  "contacts": [
+    {
+      "name": "Alex Rivera",
+      "phone": "+1-555-0987",
+      "email": "alex.r.crypto@tutanota.com",
+      "notes": "Primary contact for eastern operations"
+    },
+    {
+      "name": "M. Thompson", 
+      "phone": "+44-7911-123456",
+      "notes": "London connection"
+    },
+    {
+      "name": "Jane Smith",
+      "phone": "+1-555-2468", 
+      "email": "jane.smith@protonmail.com",
+      "notes": "Logistics coordinator"
+    }
+  ],
+  "applications": [
+    {
+      "name": "WhatsApp",
+      "version": "2.23.24.76",
+      "last_used": "2024-01-12T16:45:00Z"
+    },
+    {
+      "name": "Signal", 
+      "version": "6.42.2",
+      "last_used": "2024-01-11T09:20:00Z"
+    },
+    {
+      "name": "Bitcoin Wallet",
+      "version": "8.4.1", 
+      "last_used": "2024-01-10T20:48:00Z"
+    }
+  ],
+  "financial_data": {
+    "crypto_addresses": [
+      {
+        "address": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+        "type": "bitcoin",
+        "transactions": [
+          {
+            "amount": "50000 USD equivalent",
+            "timestamp": "2024-01-10T20:45:00Z",
+            "direction": "outgoing"
+          }
+        ]
+      }
+    ],
+    "bank_accounts": [
+      {
+        "account_number": "987654321",
+        "bank_name": "Bank of International Commerce",
+        "type": "checking"
+      }
+    ]
+  },
+  "location_data": [
+    {
+      "timestamp": "2024-01-10T23:00:00Z",
+      "latitude": 42.3587,
+      "longitude": -71.0567,
+      "address": "Warehouse District, Building 7, Boston, MA"
+    },
+    {
+      "timestamp": "2024-01-11T15:30:00Z", 
+      "latitude": 42.3601,
+      "longitude": -71.0589,
+      "address": "Downtown Boston, MA"
+    }
+  ]
+}
