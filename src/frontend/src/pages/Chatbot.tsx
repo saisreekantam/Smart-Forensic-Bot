@@ -4,10 +4,10 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import { Send, Search, MessageSquare, FileText, AlertTriangle, History, Plus, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { Badge } from '@/components/ui/badge';
 
 interface Message {
   id: string;
@@ -334,23 +334,23 @@ const ForensicChatbot = () => {
   }
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] max-w-7xl mx-auto gap-4">
+    <div className="flex h-[calc(100vh-8rem)] max-w-7xl mx-auto gap-4 bg-slate-900">
       {/* Chat History Sidebar */}
       <div className={`transition-all duration-300 ${showHistory ? 'w-80' : 'w-12'} flex flex-col`}>
-        <Card className="flex-1 flex flex-col">
-          <div className="p-3 border-b">
+        <Card className="flex-1 flex flex-col bg-slate-800 border-slate-700 shadow-sm">
+          <div className="p-3 border-b border-slate-700 bg-slate-800">
             <div className="flex items-center justify-between">
               {showHistory && (
                 <div className="flex items-center gap-2">
-                  <History className="w-4 h-4" />
-                  <span className="font-medium text-sm">Chat History</span>
+                  <History className="w-4 h-4 text-slate-300" />
+                  <span className="font-medium text-sm text-slate-200">Chat History</span>
                 </div>
               )}
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowHistory(!showHistory)}
-                className="w-8 h-8 p-0"
+                className="w-8 h-8 p-0 hover:bg-slate-700 text-slate-300"
               >
                 <History className="w-4 h-4" />
               </Button>
@@ -359,7 +359,7 @@ const ForensicChatbot = () => {
 
           {showHistory && (
             <>
-              <div className="p-3 border-b">
+              <div className="p-3 border-b border-slate-700">
                 <Button
                   variant="outline"
                   size="sm"
@@ -367,7 +367,7 @@ const ForensicChatbot = () => {
                     const selectedCaseId = localStorage.getItem('selectedCaseId');
                     if (selectedCaseId) createNewChatSession(selectedCaseId);
                   }}
-                  className="w-full"
+                  className="w-full border-slate-600 text-slate-200 hover:bg-slate-700 bg-slate-800"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   New Chat
@@ -379,22 +379,22 @@ const ForensicChatbot = () => {
                   {chatSessions.map((session) => (
                     <div
                       key={session.id}
-                      className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                      className={`group p-3 rounded-lg border cursor-pointer transition-colors ${
                         session.id === currentSessionId
-                          ? 'bg-blue-50 border-blue-200'
-                          : 'hover:bg-gray-50'
+                          ? 'bg-blue-900/50 border-blue-600 shadow-sm'
+                          : 'border-slate-600 hover:bg-slate-700 hover:border-slate-500'
                       }`}
                       onClick={() => switchChatSession(session.id)}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">
+                          <p className="text-sm font-medium text-slate-100 truncate">
                             {session.title}
                           </p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-xs text-slate-400">
                             {session.message_count} messages
                           </p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-xs text-slate-500">
                             {new Date(session.created_at).toLocaleDateString()}
                           </p>
                         </div>
@@ -405,16 +405,16 @@ const ForensicChatbot = () => {
                             e.stopPropagation();
                             deleteChatSession(session.id);
                           }}
-                          className="w-6 h-6 p-0 opacity-0 group-hover:opacity-100 hover:bg-red-100"
+                          className="w-6 h-6 p-0 opacity-0 group-hover:opacity-100 hover:bg-red-800 transition-opacity text-red-400"
                         >
-                          <Trash2 className="w-3 h-3 text-red-600" />
+                          <Trash2 className="w-3 h-3" />
                         </Button>
                       </div>
                     </div>
                   ))}
 
                   {chatSessions.length === 0 && (
-                    <div className="text-center py-8 text-muted-foreground">
+                    <div className="text-center py-8 text-slate-400">
                       <History className="w-8 h-8 mx-auto mb-2 opacity-50" />
                       <p className="text-sm">No chat sessions yet</p>
                     </div>
@@ -429,22 +429,22 @@ const ForensicChatbot = () => {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Case Info Header */}
-        <div className="bg-slate-50 border rounded-lg p-4 mb-4">
+        <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white border rounded-lg p-4 mb-4 shadow-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <FileText className="w-5 h-5 text-blue-600" />
+              <FileText className="w-5 h-5 text-blue-200" />
               <div>
-                <h2 className="font-semibold text-lg">{caseInfo.case_number}</h2>
-                <p className="text-sm text-muted-foreground">{caseInfo.title}</p>
-                <p className="text-xs text-muted-foreground">Lead: {caseInfo.investigator_name}</p>
+                <h2 className="font-semibold text-lg text-white">{caseInfo.case_number}</h2>
+                <p className="text-sm text-blue-100">{caseInfo.title}</p>
+                <p className="text-xs text-blue-200">Lead: {caseInfo.investigator_name}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="outline">
+              <Badge variant="secondary" className="bg-blue-700 text-blue-100 border-blue-600">
                 {caseInfo.processed_evidence_count}/{caseInfo.total_evidence_count} Files Processed
               </Badge>
               {caseInfo.processed_evidence_count === 0 && (
-                <Badge variant="destructive" className="flex items-center gap-1">
+                <Badge variant="destructive" className="flex items-center gap-1 bg-red-600 text-white">
                   <AlertTriangle className="w-3 h-3" />
                   No Evidence Processed
                 </Badge>
@@ -454,21 +454,21 @@ const ForensicChatbot = () => {
         </div>
 
         {/* Chat Area */}
-        <Card className="flex-1 flex flex-col">
-          <div className="p-4 border-b bg-slate-50/50">
+        <Card className="flex-1 flex flex-col bg-slate-800 border-slate-700 shadow-lg">
+          <div className="p-4 border-b border-slate-700 bg-gradient-to-r from-slate-800 to-slate-700">
             <div className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-blue-600" />
-              <h3 className="font-semibold">ForensicAI Investigation Assistant</h3>
-              <Badge variant="outline" className="text-xs">
+              <MessageSquare className="w-5 h-5 text-blue-400" />
+              <h3 className="font-semibold text-slate-100">ForensicAI Investigation Assistant</h3>
+              <Badge variant="secondary" className="text-xs bg-slate-700 text-slate-200 border-slate-600">
                 Case-Specific Analysis
               </Badge>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-sm text-slate-300 mt-1">
               Ask questions about the evidence, request analysis, or seek investigative insights
             </p>
           </div>
 
-        <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
+        <ScrollArea className="flex-1 p-4 bg-slate-900" ref={scrollAreaRef}>
           <div className="space-y-4">
             {messages.map((message) => (
               <div
@@ -476,23 +476,23 @@ const ForensicChatbot = () => {
                 className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[80%] rounded-lg p-3 ${
+                  className={`max-w-[80%] rounded-lg p-4 shadow-lg ${
                     message.isUser
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-slate-100 text-slate-900'
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white border border-blue-500'
+                      : 'bg-slate-700 text-slate-100 border border-slate-600 shadow-md'
                   }`}
                 >
                   <p className="text-sm whitespace-pre-wrap">{message.text}</p>
                   
                   {/* Show sources for bot messages */}
                   {!message.isUser && message.sources && message.sources.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-slate-200">
-                      <p className="text-xs font-medium text-slate-600 mb-2">Sources:</p>
+                    <div className="mt-3 pt-3 border-t border-slate-600">
+                      <p className="text-xs font-medium text-slate-300 mb-2">Sources:</p>
                       {message.sources.map((source, index) => (
-                        <div key={index} className="text-xs text-slate-600 mb-1 flex items-center gap-2">
-                          <FileText className="w-3 h-3" />
-                          <span>{source.filename}</span>
-                          <Badge variant="outline" className="text-xs">
+                        <div key={index} className="text-xs text-slate-300 mb-1 flex items-center gap-2">
+                          <FileText className="w-3 h-3 text-blue-400" />
+                          <span className="font-medium">{source.filename}</span>
+                          <Badge variant="outline" className="text-xs border-blue-400 text-blue-300 bg-blue-900/30">
                             {source.evidence_type}
                           </Badge>
                           {source.confidence && (
@@ -507,8 +507,8 @@ const ForensicChatbot = () => {
 
                   {/* Show confidence for bot messages */}
                   {!message.isUser && message.confidence !== undefined && (
-                    <div className="mt-2 pt-2 border-t border-slate-200">
-                      <span className="text-xs text-slate-600">
+                    <div className="mt-2 pt-2 border-t border-slate-600">
+                      <span className="text-xs text-slate-300">
                         Confidence: 
                         <span className={`ml-1 font-medium ${getConfidenceColor(message.confidence)}`}>
                           {(message.confidence * 100).toFixed(0)}%
@@ -517,7 +517,7 @@ const ForensicChatbot = () => {
                     </div>
                   )}
 
-                  <p className="text-xs mt-2 opacity-70">
+                  <p className={`text-xs mt-2 ${message.isUser ? 'text-blue-200' : 'text-slate-400'}`}>
                     {formatTimestamp(message.timestamp)}
                   </p>
                 </div>
@@ -526,9 +526,9 @@ const ForensicChatbot = () => {
             
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-slate-100 rounded-lg p-3 text-slate-900">
+                <div className="bg-slate-700 rounded-lg p-4 text-slate-100 border border-slate-600 shadow-lg max-w-[80%]">
                   <div className="flex items-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400"></div>
                     <span className="text-sm">Analyzing evidence and generating response...</span>
                   </div>
                 </div>
@@ -538,38 +538,39 @@ const ForensicChatbot = () => {
         </ScrollArea>
 
         {/* Input Area */}
-        <div className="p-4 border-t bg-slate-50/50">
+        <div className="p-4 border-t border-slate-700 bg-slate-800">
           {caseInfo.processed_evidence_count === 0 ? (
-            <div className="flex items-center justify-center p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <AlertTriangle className="w-5 h-5 text-yellow-600 mr-2" />
-              <span className="text-sm text-yellow-800">
+            <div className="flex items-center justify-center p-4 bg-amber-900/30 border border-amber-600 rounded-lg">
+              <AlertTriangle className="w-5 h-5 text-amber-400 mr-2" />
+              <span className="text-sm text-amber-200">
                 Upload and process evidence files before starting queries
               </span>
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="ml-4"
+                className="ml-4 border-amber-500 text-amber-300 hover:bg-amber-900/50"
                 onClick={() => navigate('/dashboard')}
               >
                 Go to Dashboard
               </Button>
             </div>
           ) : (
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <Input
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Ask about evidence, request analysis, or seek investigative insights..."
                 disabled={isLoading}
-                className="flex-1"
+                className="flex-1 border-slate-600 bg-slate-700 text-slate-100 placeholder-slate-400 focus:border-blue-500 focus:ring-blue-500 h-12 text-base px-4"
               />
               <Button 
                 onClick={handleSendMessage} 
                 disabled={isLoading || !inputText.trim()}
                 size="lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white border-0 px-6 h-12"
               >
-                <Send className="w-4 h-4" />
+                <Send className="w-5 h-5" />
               </Button>
             </div>
           )}
