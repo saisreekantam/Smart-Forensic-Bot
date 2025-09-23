@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import CaseSelection from "./pages/CaseSelection";
 import EvidenceViewer from "./pages/EvidenceViewer";
 import NetworkAnalysis from "./pages/NetworkAnalysis";
+import AIInvestigation from "./pages/AIInvestigation";
 
 const queryClient = new QueryClient();
 
@@ -137,6 +138,20 @@ const App = () => (
                   <Header />
                   <main className="flex-1 p-6">
                     <NetworkAnalysis />
+                  </main>
+                </SidebarInset>
+              </div>
+            </SidebarProvider>
+          } />
+          
+          <Route path="/ai-investigation" element={
+            <SidebarProvider>
+              <div className="flex min-h-screen w-full">
+                <AppSidebar />
+                <SidebarInset>
+                  <Header />
+                  <main className="flex-1 p-6">
+                    <AIInvestigation />
                   </main>
                 </SidebarInset>
               </div>

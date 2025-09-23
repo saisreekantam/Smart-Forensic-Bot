@@ -717,11 +717,11 @@ class EnhancedKnowledgeGraphDB:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                    SELECT entity_id, entity_name, entity_type, description, 
+                    SELECT id, entity_value, entity_type, context, 
                            importance_score, confidence, metadata, created_at, updated_at
-                    FROM entities 
+                    FROM kg_entities 
                     WHERE case_id = ?
-                    ORDER BY importance_score DESC, entity_name
+                    ORDER BY importance_score DESC, entity_value
                 """, (case_id,))
                 
                 entities = []
@@ -750,10 +750,10 @@ class EnhancedKnowledgeGraphDB:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                    SELECT relationship_id, source_entity_id, target_entity_id, 
-                           relationship_type, description, confidence, metadata, 
+                    SELECT id, entity1_id, entity2_id, 
+                           relationship_type, context, confidence, metadata, 
                            created_at, updated_at
-                    FROM relationships 
+                    FROM kg_relationships 
                     WHERE case_id = ?
                     ORDER BY confidence DESC, relationship_type
                 """, (case_id,))

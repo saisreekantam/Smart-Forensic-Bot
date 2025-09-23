@@ -39,6 +39,10 @@ from chat_history_manager import chat_history_manager
 from src.ai_cores.case_memory import case_memory
 from src.ai_cores.enhanced_knowledge_graph import enhanced_kg_db
 from src.ai_cores.intelligent_report_generator import report_generator
+from src.ai_cores.supreme_forensic_agent import (
+    supreme_agent, analyze_case_intelligently, detect_patterns_intelligently,
+    analyze_timeline_intelligently, get_investigation_guidance
+)
 
 logger = logging.getLogger(__name__)
 
@@ -1582,3 +1586,392 @@ async def enhanced_health_check():
             "timestamp": datetime.now().isoformat()
         }
 
+# =============================================================================
+# GPT-5 INTELLIGENCE ENGINE ENDPOINTS
+# =============================================================================
+
+# Import the new GPT-5 intelligence engine
+from src.ai_cores.gpt5_intelligence_engine import (
+    generate_evidence_timeline,
+    analyze_network_flows,
+    detect_evidence_patterns,
+    get_intelligence_engine,
+    AnalysisType,
+    IntelligenceRequest
+)
+
+class TimelineRequest(BaseModel):
+    time_range: Optional[str] = Field(None, description="Time range for analysis (e.g., '2024-01-01 to 2024-01-31')")
+    focus_entities: Optional[List[str]] = Field(None, description="Specific entities to focus on")
+    event_types: Optional[List[str]] = Field(None, description="Types of events to include")
+
+class NetworkAnalysisRequest(BaseModel):
+    analysis_depth: Optional[str] = Field("standard", description="Analysis depth: basic, standard, deep")
+    focus_entities: Optional[List[str]] = Field(None, description="Entities to focus network analysis on")
+    relationship_types: Optional[List[str]] = Field(None, description="Types of relationships to analyze")
+
+class IntelligenceResponse(BaseModel):
+    success: bool
+    case_id: str
+    analysis_type: str
+    timestamp: str
+    results: Dict[str, Any]
+    insights: List[str]
+    confidence_scores: Dict[str, float]
+    timeline_events: Optional[List[Dict[str, Any]]] = None
+    network_flows: Optional[List[Dict[str, Any]]] = None
+    entities: Optional[List[Dict[str, Any]]] = None
+    relationships: Optional[List[Dict[str, Any]]] = None
+    workflow_steps: Optional[List[str]] = None
+    error: Optional[str] = None
+
+@app.post("/cases/{case_id}/intelligence/timeline", response_model=IntelligenceResponse)
+async def generate_intelligent_timeline(case_id: str, request: TimelineRequest):
+    """
+    Generate intelligent evidence timeline using GPT-5 multi-agent analysis
+    """
+    try:
+        # Verify case exists
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        # Prepare parameters
+        parameters = {
+            "time_range": request.time_range,
+            "focus_entities": request.focus_entities or [],
+            "event_types": request.event_types or []
+        }
+        
+        # Generate timeline using GPT-5 intelligence engine
+        result = await generate_evidence_timeline(case_id, parameters)
+        
+        if not result.get("success", False):
+            raise HTTPException(status_code=500, detail=result.get("error", "Timeline generation failed"))
+        
+        return IntelligenceResponse(**result)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error generating intelligent timeline for case {case_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.post("/cases/{case_id}/intelligence/network", response_model=IntelligenceResponse)
+async def analyze_intelligent_network(case_id: str, request: NetworkAnalysisRequest):
+    """
+    Perform intelligent network flow analysis using GPT-5 multi-agent system
+    """
+    try:
+        # Verify case exists
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        # Prepare parameters
+        parameters = {
+            "analysis_depth": request.analysis_depth,
+            "focus_entities": request.focus_entities or [],
+            "relationship_types": request.relationship_types or []
+        }
+        
+        # Analyze network using GPT-5 intelligence engine
+        result = await analyze_network_flows(case_id, parameters)
+        
+        if not result.get("success", False):
+            raise HTTPException(status_code=500, detail=result.get("error", "Network analysis failed"))
+        
+        return IntelligenceResponse(**result)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error analyzing network for case {case_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.get("/cases/{case_id}/evidence/timeline")
+async def get_evidence_timeline_data(case_id: str):
+    """
+    Get timeline data for Evidence Viewer page
+    """
+    try:
+        # Verify case exists
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        # Try to get GPT-5 generated timeline first
+        try:
+            timeline_result = await generate_evidence_timeline(case_id, {})
+            if timeline_result.get("success"):
+                return {
+                    "timeline_events": timeline_result.get("timeline_events", []),
+                    "insights": timeline_result.get("insights", []),
+                    "confidence": timeline_result.get("confidence_scores", {}).get("timeline", 0.8),
+                    "generated_by": "gpt5_intelligence",
+                    "case_id": case_id
+                }
+        except Exception as e:
+            logger.warning(f"GPT-5 timeline generation failed, using fallback: {str(e)}")
+        
+        # Fallback to basic timeline from case data
+        evidence_items = case_manager.get_case_evidence(case_id)
+        timeline_events = []
+        
+        for evidence in evidence_items:
+            timeline_events.append({
+                "timestamp": evidence.created_at.isoformat(),
+                "event": f"Evidence uploaded: {evidence.original_filename}",
+                "type": "evidence_upload",
+                "significance": 0.6,
+                "confidence": 0.9,
+                "evidence_refs": [evidence.id],
+                "metadata": {
+                    "evidence_type": evidence.evidence_type,
+                    "file_size": evidence.file_size,
+                    "processing_status": evidence.processing_status
+                }
+            })
+        
+        return {
+            "timeline_events": sorted(timeline_events, key=lambda x: x["timestamp"]),
+            "insights": ["Basic timeline generated from evidence upload data"],
+            "confidence": 0.7,
+            "generated_by": "basic_timeline",
+            "case_id": case_id
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting timeline data for case {case_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+# =============================================================================
+# SUPREME FORENSIC AGENT ENDPOINTS - Evidence Viewer Integration
+# =============================================================================
+
+class SupremeAnalysisRequest(BaseModel):
+    query: Optional[str] = Field("Analyze this case comprehensively", description="Specific analysis query")
+    analysis_mode: Optional[str] = Field("overview", description="Analysis mode: overview, pattern_detection, timeline_analysis, investigation_guidance")
+
+class SupremeAnalysisResponse(BaseModel):
+    success: bool
+    case_id: str
+    analysis_mode: str
+    confidence_score: float
+    structured_analysis: Dict[str, Any]
+    investigation_recommendations: List[str]
+    evidence_gaps: List[str]
+    next_steps: List[str]
+    patterns_detected: Optional[List[Dict[str, Any]]] = None
+    raw_analysis: str
+    timestamp: str
+
+@app.post("/cases/{case_id}/evidence/analyze-patterns", response_model=SupremeAnalysisResponse)
+async def find_evidence_patterns(case_id: str, request: SupremeAnalysisRequest):
+    """
+    🔍 Find Patterns - Supreme AI pattern detection for Evidence Viewer
+    Uses the most advanced forensic AI to detect patterns in case evidence
+    """
+    try:
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        # Use the Supreme Forensic Agent for pattern detection
+        result = await detect_patterns_intelligently(case_id, request.query)
+        
+        if not result.get("success", False):
+            raise HTTPException(status_code=500, detail="Pattern analysis failed")
+        
+        return SupremeAnalysisResponse(
+            success=True,
+            case_id=case_id,
+            analysis_mode="pattern_detection",
+            confidence_score=result.get("confidence_score", 0.8),
+            structured_analysis=result.get("structured_analysis", {}),
+            investigation_recommendations=result.get("investigation_recommendations", []),
+            evidence_gaps=result.get("evidence_gaps", []),
+            next_steps=result.get("next_steps", []),
+            patterns_detected=result.get("patterns_found", []),
+            raw_analysis=result.get("raw_analysis", ""),
+            timestamp=datetime.now().isoformat()
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in supreme pattern analysis for case {case_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Pattern analysis failed: {str(e)}")
+
+@app.post("/cases/{case_id}/evidence/supreme-analysis", response_model=SupremeAnalysisResponse)
+async def supreme_case_analysis(case_id: str, request: SupremeAnalysisRequest):
+    """
+    🧠 Supreme Analysis - Advanced forensic investigation analysis
+    Provides comprehensive case analysis using the Supreme Forensic Agent
+    """
+    try:
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        # Use the Supreme Forensic Agent for comprehensive analysis
+        result = await analyze_case_intelligently(case_id, request.query, request.analysis_mode)
+        
+        if not result.get("success", False):
+            raise HTTPException(status_code=500, detail="Supreme analysis failed")
+        
+        return SupremeAnalysisResponse(
+            success=True,
+            case_id=case_id,
+            analysis_mode=request.analysis_mode,
+            confidence_score=result.get("confidence_score", 0.8),
+            structured_analysis=result.get("structured_analysis", {}),
+            investigation_recommendations=result.get("investigation_recommendations", []),
+            evidence_gaps=result.get("evidence_gaps", []),
+            next_steps=result.get("next_steps", []),
+            raw_analysis=result.get("raw_analysis", ""),
+            timestamp=datetime.now().isoformat()
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in supreme analysis for case {case_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Supreme analysis failed: {str(e)}")
+
+@app.post("/cases/{case_id}/evidence/investigation-guidance", response_model=SupremeAnalysisResponse)
+async def get_supreme_investigation_guidance(case_id: str, request: SupremeAnalysisRequest):
+    """
+    🎯 Investigation Guidance - Strategic investigation recommendations
+    Provides expert guidance on investigation priorities and next steps
+    """
+    try:
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        # Use the Supreme Forensic Agent for investigation guidance
+        result = await get_investigation_guidance(case_id, request.query)
+        
+        if not result.get("success", False):
+            raise HTTPException(status_code=500, detail="Investigation guidance failed")
+        
+        return SupremeAnalysisResponse(
+            success=True,
+            case_id=case_id,
+            analysis_mode="investigation_guidance",
+            confidence_score=result.get("confidence_score", 0.9),
+            structured_analysis=result.get("structured_analysis", {}),
+            investigation_recommendations=result.get("investigation_recommendations", []),
+            evidence_gaps=result.get("evidence_gaps", []),
+            next_steps=result.get("next_steps", []),
+            raw_analysis=result.get("raw_analysis", ""),
+            timestamp=datetime.now().isoformat()
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in investigation guidance for case {case_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Investigation guidance failed: {str(e)}")
+
+@app.post("/cases/{case_id}/evidence/timeline-analysis", response_model=SupremeAnalysisResponse)  
+async def supreme_timeline_analysis(case_id: str, request: SupremeAnalysisRequest):
+    """
+    ⏰ Timeline Analysis - Advanced timeline reconstruction and analysis
+    Provides detailed timeline analysis using AI forensic expertise
+    """
+    try:
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        # Use the Supreme Forensic Agent for timeline analysis
+        result = await analyze_timeline_intelligently(case_id, request.query)
+        
+        if not result.get("success", False):
+            raise HTTPException(status_code=500, detail="Timeline analysis failed")
+        
+        return SupremeAnalysisResponse(
+            success=True,
+            case_id=case_id,
+            analysis_mode="timeline_analysis",
+            confidence_score=result.get("confidence_score", 0.85),
+            structured_analysis=result.get("structured_analysis", {}),
+            investigation_recommendations=result.get("investigation_recommendations", []),
+            evidence_gaps=result.get("evidence_gaps", []),
+            next_steps=result.get("next_steps", []),
+            raw_analysis=result.get("raw_analysis", ""),
+            timestamp=datetime.now().isoformat()
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in timeline analysis for case {case_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Timeline analysis failed: {str(e)}")
+
+@app.get("/cases/{case_id}/network/data")
+async def get_network_analysis_data(case_id: str):
+    """
+    Get network analysis data for Network Analysis page
+    """
+    try:
+        # Verify case exists
+        case = case_manager.get_case(case_id)
+        if not case:
+            raise HTTPException(status_code=404, detail="Case not found")
+        
+        # Try to get GPT-5 generated network analysis first
+        try:
+            network_result = await analyze_network_flows(case_id, {})
+            if network_result.get("success"):
+                return {
+                    "network_flows": network_result.get("network_flows", []),
+                    "entities": network_result.get("entities", []),
+                    "relationships": network_result.get("relationships", []),
+                    "insights": network_result.get("insights", []),
+                    "confidence": network_result.get("confidence_scores", {}).get("network", 0.8),
+                    "generated_by": "gpt5_intelligence",
+                    "case_id": case_id
+                }
+        except Exception as e:
+            logger.warning(f"GPT-5 network analysis failed, using fallback: {str(e)}")
+        
+        # Fallback to basic network from knowledge graph
+        entities = enhanced_kg_db.get_case_entities(case_id) or []
+        relationships = enhanced_kg_db.get_case_relationships(case_id) or []
+        
+        # Create basic network flows
+        network_flows = []
+        for rel in relationships[:20]:  # Limit for performance
+            network_flows.append({
+                "source": rel.get("source_entity_id", "unknown"),
+                "target": rel.get("target_entity_id", "unknown"),
+                "weight": rel.get("confidence", 0.5),
+                "type": rel.get("relationship_type", "related"),
+                "frequency": 1,
+                "metadata": rel.get("metadata", {})
+            })
+        
+        return {
+            "network_flows": network_flows,
+            "entities": entities[:50],
+            "relationships": relationships[:50],
+            "insights": ["Basic network generated from knowledge graph data"],
+            "confidence": 0.7,
+            "generated_by": "basic_network",
+            "case_id": case_id
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting network data for case {case_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

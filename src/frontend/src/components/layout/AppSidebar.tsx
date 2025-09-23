@@ -14,6 +14,7 @@ import {
   Eye,
   ChevronRight,
   FolderOpen,
+  Brain,
 } from "lucide-react";
 
 import {
@@ -40,6 +41,7 @@ const mainItems = [
 
 const investigationItems = [
   { title: "Evidence Viewer", url: "/evidence", icon: Eye },
+  { title: "AI Investigation", url: "/ai-investigation", icon: Brain },
   { title: "Network Analysis", url: "/network", icon: Network },
   { title: "Database Search", url: "/database", icon: Database },
 ];

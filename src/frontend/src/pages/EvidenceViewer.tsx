@@ -54,30 +54,81 @@ const EvidenceViewer: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedView, setSelectedView] = useState<'grid' | 'timeline' | 'relationships'>('grid');
   const [selectedCaseId, setSelectedCaseId] = useState<string>('');
+  const [caseInfo, setCaseInfo] = useState<{ case_number: string; title: string } | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [patternAnalysisLoading, setPatternAnalysisLoading] = useState(false);
+  const [patternAnalysisResults, setPatternAnalysisResults] = useState<any | null>(null);
 
-  // Get case ID from URL params or use a default
+  // Get case ID from localStorage (selected in CaseSelection) or URL params
   useEffect(() => {
     const resolveAndSetCaseId = async () => {
       try {
-        // In a real app, you'd get this from router params
-        // For now, we'll use a default case number and resolve it to ID
-        const caseNumberOrId = new URLSearchParams(window.location.search).get('caseId') || 'DEMO-2024-001';
+        console.log('🔍 Starting case resolution...');
         
-        // Resolve case number to case ID if needed
-        const resolvedCaseId = await caseService.resolveCaseId(caseNumberOrId);
-        setSelectedCaseId(resolvedCaseId);
+        // First try to get from localStorage (selected case)
+        let caseNumberOrId = localStorage.getItem('selectedCaseId');
+        console.log('localStorage selectedCaseId:', caseNumberOrId);
+        
+        // If not in localStorage, try URL params
+        if (!caseNumberOrId) {
+          caseNumberOrId = new URLSearchParams(window.location.search).get('caseId');
+          console.log('URL caseId param:', caseNumberOrId);
+        }
+        
+        // If still nothing, try case number from localStorage
+        if (!caseNumberOrId) {
+          const caseNumber = localStorage.getItem('selectedCaseNumber');
+          console.log('localStorage selectedCaseNumber:', caseNumber);
+          if (caseNumber) {
+            console.log('Resolving case number to UUID...');
+            const resolvedCaseId = await caseService.resolveCaseId(caseNumber);
+            console.log('Resolved case ID:', resolvedCaseId);
+            setSelectedCaseId(resolvedCaseId);
+            return;
+          }
+        }
+        
+        // If we have a value, check if it's a UUID or case number
+        if (caseNumberOrId) {
+          console.log('Processing case ID/number:', caseNumberOrId);
+          if (caseNumberOrId.includes('-') && caseNumberOrId.length > 30) {
+            // Looks like a UUID, use directly
+            console.log("At least i came here");
+            console.log('Detected UUID, using directly');
+            console.log('Set case ID from UUID:', caseNumberOrId);
+            setSelectedCaseId(caseNumberOrId);
+            console.log('Set case ID from UUID:', caseNumberOrId);
+            // Get case info from localStorage if available
+            const caseNumber = localStorage.getItem('selectedCaseNumber');
+            if (caseNumber) {
+              setCaseInfo({ case_number: caseNumber, title: 'Loading...' });
+            }
+          } else {
+            // Looks like a case number, resolve to UUID
+            console.log('Detected case number, resolving to UUID...');
+            const resolvedCaseId = await caseService.resolveCaseId(caseNumberOrId);
+            console.log('Resolved case ID:', resolvedCaseId);
+            setSelectedCaseId(resolvedCaseId);
+            setCaseInfo({ case_number: caseNumberOrId, title: 'Loading...' });
+          }
+          console.log('✅ Case ID set:', selectedCaseId);
+        } else {
+          // No case selected, show error
+          console.log('❌ No case selected');
+          setError('No case selected. Please select a case from the dashboard first.');
+        }
       } catch (error) {
-        console.error('Failed to resolve case ID:', error);
+        console.error('❌ Failed to resolve case ID:', error);
         setError(`Failed to find case: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     };
-
+    console.log('🛠️ Resolving case ID on component mount...');
     resolveAndSetCaseId();
   }, []);
 
   // Fetch evidence data from API
   useEffect(() => {
+    console.log('📂 Fetching evidence data for case:', selectedCaseId);
     if (!selectedCaseId) return;
     
     const fetchEvidenceData = async () => {
@@ -90,7 +141,7 @@ const EvidenceViewer: React.FC = () => {
           evidenceService.getEnhancedCaseEvidence(selectedCaseId),
           evidenceService.getEvidenceTimeline(selectedCaseId)
         ]);
-
+        console.log('Fetched evidence and timeline data:', { evidenceData, timelineData });
         // Handle evidence data
         if (evidenceData.status === 'fulfilled') {
           setEvidenceList(evidenceData.value);
@@ -107,6 +158,7 @@ const EvidenceViewer: React.FC = () => {
             evidence: event.evidence,
             importance: event.importance
           }));
+          console.log('Timeline events:', timelineEvents);
           setTimeline(timelineEvents);
         } else {
           console.warn('Timeline data not available, using empty timeline');
@@ -130,7 +182,7 @@ const EvidenceViewer: React.FC = () => {
         setLoading(false);
       }
     };
-
+    console.log('🛠️ Fetching evidence data due to case ID change...');
     fetchEvidenceData();
   }, [selectedCaseId]);
 
@@ -146,6 +198,39 @@ const EvidenceViewer: React.FC = () => {
       setError('Failed to refresh evidence data');
     } finally {
       setRefreshing(false);
+    }
+  };
+
+  // Pattern Analysis using Supreme Forensic Agent
+  const handlePatternAnalysis = async () => {
+    setPatternAnalysisLoading(true);
+    try {
+      const response = await fetch(`/api/cases/${selectedCaseId}/evidence/analyze-patterns`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: 'Analyze all evidence patterns and provide intelligent insights'
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const results = await response.json();
+      setPatternAnalysisResults(results);
+      setError(null);
+      
+      // Show results in a new tab or modal (you can enhance this)
+      alert(`Pattern Analysis Complete!\n\nKey Findings: ${results.analysis.substring(0, 200)}...`);
+      
+    } catch (err) {
+      console.error('Error performing pattern analysis:', err);
+      setError('Failed to perform pattern analysis');
+    } finally {
+      setPatternAnalysisLoading(false);
     }
   };
 
@@ -217,7 +302,12 @@ const EvidenceViewer: React.FC = () => {
         <div>
           <h1 className="text-3xl font-bold">Evidence Viewer</h1>
           <p className="text-muted-foreground">
-            AI-powered forensic evidence analysis and visualization - Case: {selectedCaseId}
+            AI-powered forensic evidence analysis and visualization
+            {caseInfo ? (
+              <span> - Case {caseInfo.case_number}: {caseInfo.title}</span>
+            ) : (
+              selectedCaseId ? <span> - Case ID: {selectedCaseId.substring(0, 8)}...</span> : ''
+            )}
           </p>
         </div>
         <div className="flex gap-2">
@@ -233,6 +323,19 @@ const EvidenceViewer: React.FC = () => {
               <RefreshCw className="h-4 w-4 mr-2" />
             )}
             Refresh
+          </Button>
+          <Button 
+            variant="default" 
+            size="sm"
+            onClick={handlePatternAnalysis}
+            disabled={patternAnalysisLoading}
+          >
+            {patternAnalysisLoading ? (
+              <Brain className="h-4 w-4 mr-2 animate-pulse" />
+            ) : (
+              <Brain className="h-4 w-4 mr-2" />
+            )}
+            Find Patterns
           </Button>
           <Button variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
