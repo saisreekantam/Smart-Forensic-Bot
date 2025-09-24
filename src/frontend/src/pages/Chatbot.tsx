@@ -84,6 +84,7 @@ const ForensicChatbot = () => {
       const response = await fetch(`http://localhost:8000/cases/${caseId}/chat/sessions`);
       if (response.ok) {
         const data = await response.json();
+        console.log('Loaded chat sessions:', data);
         setChatSessions(data.sessions || []);
         
         // If no sessions exist, create a new one
@@ -114,9 +115,10 @@ const ForensicChatbot = () => {
 
       if (response.ok) {
         const data = await response.json();
-        const newSession = data.session;
+        console.log('New session created:', data);
+        const newSession = data;
         setChatSessions(prev => [newSession, ...prev]);
-        setCurrentSessionId(newSession.id);
+        setCurrentSessionId(data.session_id);
         initializeChat();
       }
     } catch (error) {
@@ -365,6 +367,7 @@ const ForensicChatbot = () => {
                   size="sm"
                   onClick={() => {
                     const selectedCaseId = localStorage.getItem('selectedCaseId');
+                    console.log('selectedCaseId:', selectedCaseId);
                     if (selectedCaseId) createNewChatSession(selectedCaseId);
                   }}
                   className="w-full border-slate-600 text-slate-200 hover:bg-slate-700 bg-slate-800"

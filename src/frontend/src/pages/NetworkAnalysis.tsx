@@ -69,110 +69,135 @@ const NetworkAnalysis: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [patterns, setPatterns] = useState<CommunicationPattern[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentCase, setCurrentCase] = useState<string>('');
+  const [error, setError] = useState<string>('');
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Mock data - replace with API calls to your knowledge graph backend
+  // Get case ID from URL params or use a default case
+  const getCaseId = () => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('case') || 'ENHANCED-2024-001'; // Default case ID
+  };
+
+  // Fetch network data from backend API
   useEffect(() => {
-    const mockNodes: NetworkNode[] = [
-      {
-        id: 'person1',
-        label: 'John Doe',
-        type: 'person',
-        importance: 0.95,
-        connections: 8,
-        metadata: { role: 'suspect', verified: true }
-      },
-      {
-        id: 'phone1',
-        label: '+1-555-0123',
-        type: 'phone',
-        importance: 0.85,
-        connections: 5,
-        metadata: { carrier: 'Verizon', type: 'mobile' }
-      },
-      {
-        id: 'person2',
-        label: 'Jane Smith',
-        type: 'person',
-        importance: 0.70,
-        connections: 4,
-        metadata: { role: 'associate', verified: false }
-      },
-      {
-        id: 'email1',
-        label: 'suspect@email.com',
-        type: 'email',
-        importance: 0.80,
-        connections: 6,
-        metadata: { provider: 'Gmail', verified: true }
-      },
-      {
-        id: 'location1',
-        label: 'Downtown Bank',
-        type: 'location',
-        importance: 0.65,
-        connections: 3,
-        metadata: { address: '123 Main St', type: 'financial' }
-      }
-    ];
+    const fetchNetworkData = async () => {
+      try {
+        setLoading(true);
+        const caseId = getCaseId();
+        
+        // First, get available cases
+        const casesResponse = await fetch('http://localhost:8000/cases');
+        const casesData = await casesResponse.json();
+        
+        // Use the first available case if default doesn't exist
+        const actualCaseId = casesData.length > 0 ? casesData[0].id : caseId;
+        setCurrentCase(actualCaseId);
+        
+        // Fetch network analysis data
+        const response = await fetch(`http://localhost:8000/cases/${actualCaseId}/network/data`);
+        
+        if (!response.ok) {
+          throw new Error(`Network API returned ${response.status}`);
+        }
+        
+        const networkData = await response.json();
+        console.log('Network data received:', networkData);
+        
+        // Transform backend data to frontend format
+        const transformedNodes: NetworkNode[] = (networkData.entities || []).map((entity: any, index: number) => ({
+          id: entity.id || `entity_${index}`,
+          label: entity.name || entity.label || `Entity ${index}`,
+          type: mapEntityType(entity.type),
+          importance: entity.importance || 0.5,
+          connections: entity.connections || 1,
+          metadata: entity.properties || entity.metadata || {},
+          x: Math.random() * 800 + 100,
+          y: Math.random() * 600 + 100
+        }));
 
-    const mockEdges: NetworkEdge[] = [
-      {
-        id: 'edge1',
-        source: 'person1',
-        target: 'phone1',
-        type: 'ownership',
-        weight: 0.95,
-        frequency: 1,
-        lastActivity: '2024-01-15T14:30:00Z',
-        metadata: { verified: true }
-      },
-      {
-        id: 'edge2',
-        source: 'person1',
-        target: 'person2',
-        type: 'communication',
-        weight: 0.75,
-        frequency: 23,
-        lastActivity: '2024-01-15T12:00:00Z',
-        metadata: { method: 'calls', suspicious: true }
-      },
-      {
-        id: 'edge3',
-        source: 'phone1',
-        target: 'location1',
-        type: 'location',
-        weight: 0.60,
-        frequency: 5,
-        lastActivity: '2024-01-14T10:45:00Z',
-        metadata: { duration: '2 hours' }
-      }
-    ];
+        const transformedEdges: NetworkEdge[] = (networkData.network_flows || []).map((flow: any, index: number) => ({
+          id: flow.id || `edge_${index}`,
+          source: flow.source,
+          target: flow.target,
+          type: mapRelationType(flow.type),
+          weight: flow.weight || 0.5,
+          frequency: flow.frequency || 1,
+          lastActivity: flow.lastActivity || new Date().toISOString(),
+          metadata: flow.metadata || {}
+        }));
 
-    const mockPatterns: CommunicationPattern[] = [
-      {
-        participants: ['John Doe', 'Jane Smith'],
-        frequency: 23,
-        pattern: 'suspicious',
-        timeRange: 'Jan 10-15, 2024',
-        suspicionScore: 0.85
-      },
-      {
-        participants: ['John Doe', '+1-555-0123'],
-        frequency: 1,
-        pattern: 'normal',
-        timeRange: 'Jan 15, 2024',
-        suspicionScore: 0.20
-      }
-    ];
+        // Generate communication patterns from relationships
+        const transformedPatterns: CommunicationPattern[] = (networkData.relationships || [])
+          .filter((rel: any) => rel.relationship_type === 'communication' || rel.relationship_type === 'contacted')
+          .slice(0, 10)
+          .map((rel: any, index: number) => ({
+            participants: [rel.source_entity_id, rel.target_entity_id].filter(Boolean),
+            frequency: rel.frequency || 1,
+            pattern: rel.confidence > 0.8 ? 'suspicious' : 'normal',
+            timeRange: rel.time_range || 'Recent',
+            suspicionScore: rel.confidence || 0.5
+          }));
 
-    setTimeout(() => {
-      setNodes(mockNodes);
-      setEdges(mockEdges);
-      setPatterns(mockPatterns);
-      setLoading(false);
-    }, 1000);
+        setNodes(transformedNodes);
+        setEdges(transformedEdges);
+        setPatterns(transformedPatterns);
+        
+      } catch (error) {
+        console.error('Error fetching network data:', error);
+        setError(`Failed to load network data: ${error}`);
+        
+        // Fallback to sample data if API fails
+        const fallbackNodes: NetworkNode[] = [
+          {
+            id: 'no_data',
+            label: 'No Network Data Available',
+            type: 'person',
+            importance: 0.5,
+            connections: 0,
+            metadata: { error: 'Could not load network data from API' }
+          }
+        ];
+        
+        setNodes(fallbackNodes);
+        setEdges([]);
+        setPatterns([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNetworkData();
   }, []);
+
+  // Helper functions to map backend data types to frontend types
+  const mapEntityType = (backendType: string): NetworkNode['type'] => {
+    const typeMap: { [key: string]: NetworkNode['type'] } = {
+      'person': 'person',
+      'phone': 'phone',
+      'phone_number': 'phone',
+      'email': 'email',
+      'location': 'location',
+      'device': 'device',
+      'account': 'account'
+    };
+    return typeMap[backendType?.toLowerCase()] || 'person';
+  };
+
+  const mapRelationType = (backendType: string): NetworkEdge['type'] => {
+    const typeMap: { [key: string]: NetworkEdge['type'] } = {
+      'communication': 'communication',
+      'contacted': 'communication',
+      'owns': 'ownership',
+      'ownership': 'ownership',
+      'located_at': 'location',
+      'location': 'location',
+      'transaction': 'transaction',
+      'related': 'association',
+      'association': 'association'
+    };
+    return typeMap[backendType?.toLowerCase()] || 'association';
+  };
 
   const getNodeColor = (type: NetworkNode['type']) => {
     switch (type) {
@@ -212,10 +237,20 @@ const NetworkAnalysis: React.FC = () => {
     node.label.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const refreshNetworkData = async () => {
+    setLoading(true);
+    // Trigger the useEffect by changing a dependency or call fetchNetworkData directly
+    window.location.reload(); // Simple refresh for now
+  };
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-96">
+      <div className="flex flex-col items-center justify-center h-96 space-y-4">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        <div className="text-center">
+          <h2 className="text-xl font-semibold">Loading Network Analysis</h2>
+          <p className="text-muted-foreground">Analyzing forensic data and building relationship graph...</p>
+        </div>
       </div>
     );
   }
@@ -227,6 +262,24 @@ const NetworkAnalysis: React.FC = () => {
         <div>
           <h1 className="text-3xl font-bold">Network Analysis</h1>
           <p className="text-muted-foreground">Interactive relationship mapping and communication pattern analysis</p>
+          {currentCase && (
+            <div className="flex items-center gap-2 mt-2">
+              <Badge variant="outline">Case: {currentCase}</Badge>
+              <Badge variant="secondary">{nodes.length} Entities</Badge>
+              <Badge variant="secondary">{edges.length} Connections</Badge>
+            </div>
+          )}
+          {error && (
+            <div className="mt-2 text-sm text-destructive">
+              {error}
+            </div>
+          )}
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={refreshNetworkData}>
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Refresh Data
+          </Button>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm">

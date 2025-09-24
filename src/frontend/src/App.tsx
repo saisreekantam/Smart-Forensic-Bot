@@ -17,6 +17,7 @@ import CaseSelection from "./pages/CaseSelection";
 import EvidenceViewer from "./pages/EvidenceViewer";
 import NetworkAnalysis from "./pages/NetworkAnalysis";
 import AIInvestigation from "./pages/AIInvestigation";
+import DatabaseSearch from "./pages/DatabaseSearch";
 
 const queryClient = new QueryClient();
 
@@ -165,10 +166,7 @@ const App = () => (
                 <SidebarInset>
                   <Header />
                   <main className="flex-1 p-6">
-                    <div className="text-center py-20">
-                      <h2 className="text-2xl font-semibold">Database Search</h2>
-                      <p className="text-muted-foreground mt-2">Database queries coming soon...</p>
-                    </div>
+                    <DatabaseSearch />
                   </main>
                 </SidebarInset>
               </div>

@@ -1972,6 +1972,331 @@ async def get_network_analysis_data(case_id: str):
         logger.error(f"Error getting network data for case {case_id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
+
+# Database Search Endpoints
+@app.get("/database/search")
+async def search_database(
+    query: str = "",
+    case_id: Optional[str] = None,
+    data_type: Optional[str] = None,
+    max_results: int = 20
+):
+    """
+    Search through the forensic database
+    
+    Args:
+        query: Search query string
+        case_id: Optional case ID to search within specific case
+        data_type: Optional data type filter (messages, files, etc.)
+        max_results: Maximum number of results to return
+    """
+    try:
+        from simple_search_system import SimpleSearchSystem
+        search_system = SimpleSearchSystem()
+        
+        if case_id and data_type:
+            # Search specific data type within a case
+            results = search_system.search_specific_data_type(case_id, data_type, query)
+        elif case_id:
+            # Search within a specific case
+            results = search_system.search_case_data(case_id, query, max_results)
+        else:
+            # Search across all available cases
+            results = []
+            # Get all available cases first
+            cases = case_manager.list_cases()
+            
+            for case in cases:
+                case_results = search_system.search_case_data(case.id, query, max_results // len(cases) if cases else max_results)
+                for result in case_results:
+                    result['case_id'] = case.id
+                    result['case_title'] = case.title or f"Case {case.id}"
+                results.extend(case_results)
+            
+            # Sort by relevance score if available
+            results = sorted(results, key=lambda x: x.get('relevance_score', 0), reverse=True)[:max_results]
+        
+        return {
+            "success": True,
+            "query": query,
+            "case_id": case_id,
+            "data_type": data_type,
+            "total_results": len(results),
+            "results": results
+        }
+        
+    except Exception as e:
+        logger.error(f"Database search error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
+
+
+@app.get("/database/cases")
+async def get_all_cases_summary():
+    """
+    Get summary of all cases in the database
+    """
+    try:
+        cases = case_manager.list_cases()
+        from simple_search_system import SimpleSearchSystem
+        search_system = SimpleSearchSystem()
+        
+        cases_summary = []
+        for case in cases:
+            try:
+                case_summary = search_system.get_case_summary(case.id)
+                cases_summary.append({
+                    "case_id": case.id,
+                    "title": case.title or f"Case {case.id}",
+                    "description": case.description,
+                    "status": case.status.value if case.status else "unknown",
+                    "created_at": case.created_at.isoformat() if case.created_at else None,
+                    "summary": case_summary
+                })
+            except Exception as e:
+                logger.warning(f"Could not get summary for case {case.id}: {str(e)}")
+                cases_summary.append({
+                    "case_id": case.id,
+                    "title": case.title or f"Case {case.id}",
+                    "description": case.description,
+                    "status": case.status.value if case.status else "unknown",
+                    "created_at": case.created_at.isoformat() if case.created_at else None,
+                    "summary": {"error": "Could not load case data"}
+                })
+        
+        return {
+            "success": True,
+            "total_cases": len(cases_summary),
+            "cases": cases_summary
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting cases summary: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get cases: {str(e)}")
+
+
+@app.get("/database/case/{case_id}/data")
+async def get_case_data_summary(case_id: str):
+    """
+    Get detailed data summary for a specific case
+    """
+    try:
+        from simple_search_system import SimpleSearchSystem
+        search_system = SimpleSearchSystem()
+        
+        case_summary = search_system.get_case_summary(case_id)
+        
+        return {
+            "success": True,
+            "case_id": case_id,
+            "data": case_summary
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting case data for {case_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get case data: {str(e)}")
+
+
+@app.get("/database/analytics/detailed")
+async def get_detailed_analytics(case_id: Optional[str] = None):
+    """
+    Get detailed analytics including call statistics, communication patterns, and forensic insights
+    """
+    try:
+        from simple_search_system import SimpleSearchSystem
+        search_system = SimpleSearchSystem()
+        from collections import Counter, defaultdict
+        
+        analytics_data = {
+            "call_statistics": {
+                "most_incoming_calls": [],
+                "most_outgoing_calls": [],
+                "most_contacted_numbers": [],
+                "call_duration_stats": {},
+                "peak_call_times": {},
+                "missed_calls": 0,
+                "answered_calls": 0,
+                "total_call_duration": 0
+            },
+            "communication_patterns": {
+                "daily_activity": {},
+                "hourly_patterns": {},
+                "contact_frequency": {},
+                "suspicious_patterns": []
+            },
+            "forensic_insights": {
+                "location_patterns": [],
+                "device_information": [],
+                "timeline_gaps": [],
+                "anomalies": []
+            },
+            "case_summary": {
+                "total_cases": 0,
+                "total_evidence_files": 0,
+                "data_types": {},
+                "date_range": {}
+            }
+        }
+        
+        # Get cases to analyze
+        cases_to_analyze = []
+        if case_id:
+            # Analyze specific case
+            case = case_manager.get_case(case_id)
+            if case:
+                cases_to_analyze = [case]
+        else:
+            # Analyze all cases
+            cases_to_analyze = case_manager.list_cases()
+        
+        analytics_data["case_summary"]["total_cases"] = len(cases_to_analyze)
+        
+        # Aggregate data from all cases
+        all_call_records = []
+        all_contact_names = []
+        all_locations = []
+        data_type_counter = Counter()
+        
+        for case in cases_to_analyze:
+            try:
+                case_summary = search_system.get_case_summary(case.id)
+                
+                # Count data sources
+                for source in case_summary.get("data_sources", []):
+                    analytics_data["case_summary"]["total_evidence_files"] += 1
+                    file_type = source.get("file_type", "unknown")
+                    data_type_counter[file_type] += 1
+                
+                # Process call records - directly read processed JSON files
+                import glob
+                processed_files = glob.glob(f"data/processed/*{case.id}*.json")
+                
+                for file_path in processed_files:
+                    try:
+                        # Only process call log files
+                        if "call" in os.path.basename(file_path).lower():
+                            with open(file_path, 'r') as f:
+                                call_data = json.load(f)
+                            
+                            # Extract call records from the JSON structure
+                            if isinstance(call_data, dict) and "records" in call_data:
+                                for record in call_data["records"]:
+                                    if record.get("data"):
+                                        all_call_records.append(record["data"])
+                                        
+                    except Exception as e:
+                        logger.warning(f"Error processing call file {file_path}: {str(e)}")
+                        continue
+                
+                # Get contact network data
+                contact_network = case_summary.get("contact_network", [])
+                for contact in contact_network:
+                    all_contact_names.append(contact.get("name", ""))
+                
+            except Exception as e:
+                logger.warning(f"Could not analyze case {case.id}: {str(e)}")
+                continue
+        
+        analytics_data["case_summary"]["data_types"] = dict(data_type_counter)
+        
+        # Analyze call records
+        if all_call_records:
+            incoming_counter = Counter()
+            outgoing_counter = Counter()
+            contact_counter = Counter()
+            duration_total = 0
+            duration_count = 0
+            hourly_activity = defaultdict(int)
+            daily_activity = defaultdict(int)
+            missed_calls = 0
+            answered_calls = 0
+            
+            for record in all_call_records:
+                direction = record.get("direction", "").lower()
+                phone_number = record.get("phone_number", "unknown")
+                contact_name = record.get("contact_name", "") or phone_number
+                duration = record.get("duration", "0")
+                status = record.get("status", "").lower()
+                timestamp = record.get("timestamp", "")
+                
+                # Count calls by direction
+                if direction == "incoming":
+                    incoming_counter[contact_name] += 1
+                elif direction == "outgoing":
+                    outgoing_counter[contact_name] += 1
+                
+                # Count all contacts
+                contact_counter[contact_name] += 1
+                
+                # Duration statistics
+                try:
+                    duration_val = int(duration)
+                    duration_total += duration_val
+                    duration_count += 1
+                except:
+                    pass
+                
+                # Status statistics
+                if status == "missed":
+                    missed_calls += 1
+                elif status == "answered":
+                    answered_calls += 1
+                
+                # Time pattern analysis
+                if timestamp:
+                    try:
+                        dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+                        hour_key = f"{dt.hour:02d}:00"
+                        day_key = dt.strftime("%Y-%m-%d")
+                        hourly_activity[hour_key] += 1
+                        daily_activity[day_key] += 1
+                    except:
+                        pass
+            
+            # Populate call statistics
+            analytics_data["call_statistics"].update({
+                "most_incoming_calls": [{"contact": k, "count": v} for k, v in incoming_counter.most_common(10)],
+                "most_outgoing_calls": [{"contact": k, "count": v} for k, v in outgoing_counter.most_common(10)],
+                "most_contacted_numbers": [{"contact": k, "count": v} for k, v in contact_counter.most_common(10)],
+                "call_duration_stats": {
+                    "average_duration": duration_total / duration_count if duration_count > 0 else 0,
+                    "total_duration": duration_total
+                },
+                "missed_calls": missed_calls,
+                "answered_calls": answered_calls,
+                "total_call_duration": duration_total
+            })
+            
+            # Communication patterns
+            analytics_data["communication_patterns"].update({
+                "daily_activity": dict(daily_activity),
+                "hourly_patterns": dict(hourly_activity),
+                "contact_frequency": dict(contact_counter.most_common(20))
+            })
+            
+            # Detect suspicious patterns
+            suspicious_patterns = []
+            for contact, count in contact_counter.most_common(5):
+                if count > 20:  # Threshold for suspicious activity
+                    suspicious_patterns.append({
+                        "type": "high_frequency",
+                        "contact": contact,
+                        "frequency": count,
+                        "description": f"High call frequency with {contact} ({count} calls)"
+                    })
+            
+            analytics_data["communication_patterns"]["suspicious_patterns"] = suspicious_patterns
+        
+        return {
+            "success": True,
+            "analytics": analytics_data,
+            "generated_at": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error generating detailed analytics: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Analytics generation failed: {str(e)}")
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
