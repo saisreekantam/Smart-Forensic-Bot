@@ -5,9 +5,13 @@ import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Send, Search, MessageSquare, FileText, AlertTriangle, History, Plus, Trash2 } from 'lucide-react';
+import { Send, Search, MessageSquare, FileText, AlertTriangle, History, Plus, Trash2, Bot, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/github-dark.css';
 
 interface Message {
   id: string;
@@ -472,23 +476,105 @@ const ForensicChatbot = () => {
           </div>
 
         <ScrollArea className="flex-1 p-4 bg-slate-900" ref={scrollAreaRef}>
-          <div className="space-y-4">
+          <div className="space-y-6">
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
+                className={`flex ${message.isUser ? 'justify-end' : 'justify-start'} group`}
               >
-                <div
-                  className={`max-w-[80%] rounded-lg p-4 shadow-lg ${
-                    message.isUser
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white border border-blue-500'
-                      : 'bg-slate-700 text-slate-100 border border-slate-600 shadow-md'
-                  }`}
-                >
-                  <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+                <div className="flex items-start gap-3 max-w-[85%]">
+                  {!message.isUser && (
+                    <div className="flex-shrink-0">
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                        <Bot className="w-4 h-4 text-white" />
+                      </div>
+                    </div>
+                  )}
                   
-                  {/* Show sources for bot messages */}
-                  {!message.isUser && message.sources && message.sources.length > 0 && (
+                  <div
+                    className={`rounded-2xl p-4 shadow-lg ${
+                      message.isUser
+                        ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white border border-blue-500/50 ml-auto'
+                        : 'bg-gradient-to-br from-slate-700 to-slate-800 text-slate-100 border border-slate-600/50'
+                    }`}
+                  >
+                    {message.isUser ? (
+                      <div className="flex items-start gap-3">
+                        <div className="flex-1">
+                          <p className="text-sm leading-relaxed">{message.text}</p>
+                        </div>
+                        <div className="flex-shrink-0">
+                          <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                            <User className="w-4 h-4 text-white" />
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="prose prose-invert prose-sm max-w-none">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          rehypePlugins={[rehypeHighlight]}
+                          components={{
+                            h1: ({children}) => <h1 className="text-xl font-bold text-blue-300 mb-3 border-b border-slate-600 pb-2">{children}</h1>,
+                            h2: ({children}) => <h2 className="text-lg font-semibold text-blue-300 mb-3 mt-4">{children}</h2>,
+                            h3: ({children}) => <h3 className="text-base font-semibold text-blue-300 mb-2 mt-3">{children}</h3>,
+                            p: ({children}) => <p className="mb-3 last:mb-0 text-slate-100 leading-relaxed">{children}</p>,
+                            ul: ({children}) => <ul className="mb-3 pl-4 space-y-1">{children}</ul>,
+                            ol: ({children}) => <ol className="mb-3 pl-4 space-y-1">{children}</ol>,
+                            li: ({children}) => <li className="text-slate-100 leading-relaxed marker:text-blue-400">{children}</li>,
+                            code: ({children, className}) => {
+                              const isInline = !className;
+                              return isInline ? (
+                                <code className="bg-slate-800 text-blue-300 px-2 py-1 rounded font-mono text-sm border border-slate-600">
+                                  {children}
+                                </code>
+                              ) : (
+                                <code className={`${className} text-sm`}>{children}</code>
+                              );
+                            },
+                            pre: ({children}) => (
+                              <pre className="bg-slate-800 border border-slate-600 rounded-lg p-4 overflow-x-auto mb-3">
+                                {children}
+                              </pre>
+                            ),
+                            blockquote: ({children}) => (
+                              <blockquote className="border-l-4 border-blue-500 pl-4 mb-3 text-slate-300 italic">
+                                {children}
+                              </blockquote>
+                            ),
+                            strong: ({children}) => <strong className="text-blue-300 font-semibold">{children}</strong>,
+                            em: ({children}) => <em className="text-blue-200 italic">{children}</em>,
+                            a: ({children, href}) => (
+                              <a href={href} className="text-blue-400 hover:text-blue-300 underline underline-offset-2" target="_blank" rel="noopener noreferrer">
+                                {children}
+                              </a>
+                            ),
+                            table: ({children}) => (
+                              <div className="overflow-x-auto mb-3">
+                                <table className="min-w-full border border-slate-600 rounded-lg">
+                                  {children}
+                                </table>
+                              </div>
+                            ),
+                            th: ({children}) => (
+                              <th className="border border-slate-600 bg-slate-800 px-3 py-2 text-left font-medium text-blue-300">
+                                {children}
+                              </th>
+                            ),
+                            td: ({children}) => (
+                              <td className="border border-slate-600 px-3 py-2 text-slate-100">
+                                {children}
+                              </td>
+                            ),
+                          }}
+                        >
+                          {message.text}
+                        </ReactMarkdown>
+                      </div>
+                    )}
+
+                    {/* Show sources for bot messages */}
+                    {!message.isUser && message.sources && message.sources.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-slate-600">
                       <p className="text-xs font-medium text-slate-300 mb-2">Sources:</p>
                       {message.sources.map((source, index) => (
@@ -506,10 +592,10 @@ const ForensicChatbot = () => {
                         </div>
                       ))}
                     </div>
-                  )}
+                    )}
 
-                  {/* Show confidence for bot messages */}
-                  {!message.isUser && message.confidence !== undefined && (
+                    {/* Show confidence for bot messages */}
+                    {!message.isUser && message.confidence !== undefined && (
                     <div className="mt-2 pt-2 border-t border-slate-600">
                       <span className="text-xs text-slate-300">
                         Confidence: 
@@ -518,11 +604,12 @@ const ForensicChatbot = () => {
                         </span>
                       </span>
                     </div>
-                  )}
+                    )}
 
-                  <p className={`text-xs mt-2 ${message.isUser ? 'text-blue-200' : 'text-slate-400'}`}>
-                    {formatTimestamp(message.timestamp)}
-                  </p>
+                    <p className={`text-xs mt-3 ${message.isUser ? 'text-blue-200' : 'text-slate-400'}`}>
+                      {formatTimestamp(message.timestamp)}
+                    </p>
+                  </div>
                 </div>
               </div>
             ))}
