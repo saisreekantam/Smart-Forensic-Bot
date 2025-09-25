@@ -318,7 +318,7 @@ const AIInvestigation: React.FC = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-3">
-            <Brain className="h-8 w-8 text-purple-600" />
+            <Brain className="h-8 w-8 text-blue-600" />
             AI Investigation Center
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -345,7 +345,7 @@ const AIInvestigation: React.FC = () => {
             onClick={runFullAIAnalysis}
             disabled={loading || !selectedCaseId}
             size="lg"
-            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
           >
             {loading ? (
               <>
@@ -448,7 +448,7 @@ const AIInvestigation: React.FC = () => {
                       {analysisResults.supreme_analysis.confidence_score}%
                     </p>
                   </div>
-                  <Star className="h-8 w-8 text-purple-500" />
+                  <Star className="h-8 w-8 text-blue-500" />
                 </div>
               </CardContent>
             </Card>
@@ -754,15 +754,15 @@ const AIInvestigation: React.FC = () => {
               Click "Run Full AI Analysis" to start comprehensive forensic investigation using our advanced AI engines.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-              <div className="p-4 bg-purple-50 rounded-lg">
-                <Brain className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                <h4 className="font-medium text-purple-900">GPT-5 Intelligence Engine</h4>
-                <p className="text-sm text-purple-700">Timeline generation & pattern detection</p>
-              </div>
               <div className="p-4 bg-blue-50 rounded-lg">
-                <Shield className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                <h4 className="font-medium text-blue-900">Supreme Forensic Agent</h4>
-                <p className="text-sm text-blue-700">Expert investigation & recommendations</p>
+                <Brain className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                <h4 className="font-medium text-blue-900">GPT-5 Intelligence Engine</h4>
+                <p className="text-sm text-blue-700">Timeline generation & pattern detection</p>
+              </div>
+              <div className="p-4 bg-slate-100 rounded-lg">
+                <Shield className="h-8 w-8 text-slate-600 mx-auto mb-2" />
+                <h4 className="font-medium text-slate-900">Supreme Forensic Agent</h4>
+                <p className="text-sm text-slate-700">Expert investigation & recommendations</p>
               </div>
             </div>
           </CardContent>
