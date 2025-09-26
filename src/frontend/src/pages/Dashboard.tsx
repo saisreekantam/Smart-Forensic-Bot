@@ -13,13 +13,13 @@ import {
 import { useState, useEffect } from "react";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
-import { QueryInterface } from "@/components/dashboard/QueryInterface";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import forensicHero from "@/assets/forensic-hero.jpg";
+
 
 interface CaseData {
   id: string;
@@ -258,10 +258,7 @@ const Dashboard = () => {
     <div className="space-y-8">
       {/* Hero Section */}
       <div className="relative overflow-hidden rounded-xl bg-gradient-subtle">
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-20"
-          style={{ backgroundImage: `url(${forensicHero})` }}
-        />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-slate-900/20" />
         <div className="relative p-8">
           <div className="max-w-2xl">
             <div className="flex items-center gap-3 mb-4">
@@ -392,7 +389,42 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Query Interface */}
         <div className="lg:col-span-2">
-          <QueryInterface />
+          <Card className="card-professional">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Search className="w-5 h-5 text-blue-400" />
+                AI Investigation Assistant
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  Start AI-Powered Investigation
+                </h3>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                  Interact with our advanced AI assistant to analyze evidence, ask questions, and get investigative insights from your case data.
+                </p>
+                <Button 
+                  onClick={() => navigate('/query')}
+                  size="lg"
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3"
+                  disabled={!caseData || caseData.processed_evidence_count === 0}
+                >
+                  <Play className="w-5 h-5 mr-2" />
+                  Launch Investigation Assistant
+                </Button>
+                {caseData && caseData.processed_evidence_count === 0 && (
+                  <p className="text-amber-400 text-sm mt-3 flex items-center justify-center gap-2">
+                    <AlertTriangle className="w-4 h-4" />
+                    Upload and process evidence first to enable AI queries
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Quick Actions & Status */}
