@@ -2,7 +2,9 @@
 
 A comprehensive AI-powered forensic investigation platform that enables law enforcement professionals to manage cases, process digital evidence, and conduct intelligent analysis through natural language interactions. The platform combines case management, evidence processing, and advanced LLM-powered chatbot capabilities.
 
-# Note: The Data should include values of gps and messages the xml we used did not have that data
+# Note:
+
+The Data should include values of gps and messages the xml we used did not have that data
 
 ## 📸 Visual Resources
 
