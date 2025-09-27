@@ -2,6 +2,16 @@
 
 A comprehensive AI-powered forensic investigation platform that enables law enforcement professionals to manage cases, process digital evidence, and conduct intelligent analysis through natural language interactions. The platform combines case management, evidence processing, and advanced LLM-powered chatbot capabilities.
 
+## 📸 Visual Resources
+
+### 🖼️ Application Screenshots
+**Google Drive Gallery**: [View Webapp Screenshots & UI Demo](https://drive.google.com/drive/folders/1ANICO674D5fWbad-WiDfQxbLe4tObIpw?usp=sharing)
+
+### 🎥 Video Demonstration
+**YouTube Demo**: *[Coming Soon - Platform Walkthrough & Features Demo]*
+
+---
+
 ## 🎯 Project Overview
 
 **Project Sentinel** is a complete case-based forensic investigation platform that transforms traditional digital forensics workflows. The system provides:
