@@ -119,8 +119,8 @@ Smart-Forensic-Investigation-Platform/
 
 ```bash
 # Clone the repository
-git clone <repository-url>
-cd Smart-Forensic-Investigation-Platform
+git clone https://github.com/saisreekantam/Smart-Forensic-Bot.git
+cd Smart-Forensic-Bot
 
 # Create virtual environment
 python3 -m venv venv
