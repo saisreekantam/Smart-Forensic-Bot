@@ -162,7 +162,7 @@ npm run dev
 
 ```bash
 # Start backend API server
-python case_api.py
+python case_api.py # src/api/case_api.py
 # Backend runs on http://localhost:8000
 
 # Frontend runs on http://localhost:3000 (if started separately)
@@ -367,7 +367,7 @@ npm run test:e2e
 ```bash
 pip install PyPDF2
 # Restart the server
-python case_api.py
+python case_api.py # src/api/case_api.py
 ```
 
 #### Search Results Too Broad/Narrow
