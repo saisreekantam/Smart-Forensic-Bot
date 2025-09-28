@@ -4,22 +4,22 @@ A comprehensive AI-powered forensic investigation platform that enables law enfo
 
 # Note:
 
-The Data should include values of gps and messages the xml we used did not have that data
+The Current prototype is limited to XML data without GPS values and messages. However, the final product will support these additional data fields.
 
-## 📸 Visual Resources
+##  Visual Resources
 
-### 🖼️ Application Screenshots
+###  Application Screenshots
 **Google Drive Gallery**: [View Webapp Screenshots & UI Demo](https://drive.google.com/drive/folders/1ANICO674D5fWbad-WiDfQxbLe4tObIpw?usp=sharing)
 
-### 🎥 Video Demonstration
+### Video Demonstration
 **Link of Google drive with Video**: [View Webapp Video Demonstration](https://drive.google.com/drive/folders/1NqEZTS1O67dbu3scGDogHwdtlbXQqZW9?usp=sharing)
 
-### 📝 Presentation Slides
+### Presentation Slides
 **PPT Google Drive link**: [View Presentation](https://drive.google.com/drive/folders/1Nl7g1yU6QBPpvbr3oDtv_Gm7UF9xtAt-?usp=sharing)
 
 ---
 
-## 🎯 Project Overview
+##  Project Overview
 
 **Project Sentinel** is a complete case-based forensic investigation platform that transforms traditional digital forensics workflows. The system provides:
 
@@ -30,7 +30,7 @@ The Data should include values of gps and messages the xml we used did not have 
 - **Smart Search**: Intelligent evidence search with fuzzy matching and relevance scoring
 - **Real-time Processing**: Background evidence processing with status tracking
 
-## 🏗️ System Architecture
+## System Architecture
 
 ### Backend Stack
 - **FastAPI**: RESTful API framework with automatic documentation
@@ -62,7 +62,7 @@ The Data should include values of gps and messages the xml we used did not have 
 - **PDF Processing**: Advanced extraction with PyPDF2
 - **Background Processing**: Asynchronous evidence processing
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 Smart-Forensic-Investigation-Platform/
@@ -115,7 +115,7 @@ Smart-Forensic-Investigation-Platform/
 └── README.md                              # This file
 ```
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 - Python 3.8+
@@ -162,7 +162,7 @@ npm run dev
 
 ```bash
 # Start backend API server
-python start_api.py
+python case_api.py
 # Backend runs on http://localhost:8000
 
 # Frontend runs on http://localhost:3000 (if started separately)
@@ -174,7 +174,7 @@ python start_api.py
 - **Interactive API**: http://localhost:8000/redoc
 - **Frontend Application**: http://localhost:3000
 
-## 🎯 Key Features
+##  Key Features
 
 ### Case Management
 - Create and organize forensic investigations
@@ -207,7 +207,7 @@ python start_api.py
 - **Real-time Updates**: Live status updates for processing and analysis
 - **Interactive Dashboard**: Visual case overview with statistics and progress
 
-## 🤖 Chatbot Capabilities
+##  Chatbot Capabilities
 
 The AI assistant can help with:
 
@@ -239,7 +239,7 @@ The AI assistant can help with:
 "Generate investigation timeline"
 ```
 
-## 📊 Database Schema
+##  Database Schema
 
 ### Core Tables
 
@@ -263,7 +263,7 @@ The AI assistant can help with:
 - Case-specific chat sessions
 - Message threading and timestamps
 
-## 🔧 API Endpoints
+##  API Endpoints
 
 ### Case Management
 ```http
@@ -291,7 +291,7 @@ GET /cases/{case_id}/chat/sessions/{session_id}/messages  # Get messages
 DELETE /cases/{case_id}/chat/sessions/{session_id}   # Delete session
 ```
 
-## ⚙️ Configuration
+##  Configuration
 
 ### Environment Variables
 ```bash
@@ -320,7 +320,7 @@ export const API_BASE_URL = process.env.NODE_ENV === 'production'
   : 'http://localhost:8000';
 ```
 
-## 🧪 Testing
+##  Testing
 
 ### Backend Tests
 ```bash
@@ -350,7 +350,7 @@ npm run test:coverage
 npm run test:e2e
 ```
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### Common Issues
 
@@ -367,7 +367,7 @@ npm run test:e2e
 ```bash
 pip install PyPDF2
 # Restart the server
-python start_api.py
+python case_api.py
 ```
 
 #### Search Results Too Broad/Narrow
@@ -379,71 +379,10 @@ if score >= 0.6:  # Lower for broader results, higher for stricter
     results.append(...)
 ```
 
-### Debug Mode
-Enable detailed logging:
-```bash
-export DEBUG_FORENSIC_BOT=true
-python start_api.py
-```
 
-## 🚀 Deployment
 
-### Production Deployment
 
-1. **Backend Deployment**
-```bash
-# Install production dependencies
-pip install gunicorn
-
-# Run with Gunicorn
-gunicorn -w 4 -k uvicorn.workers.UvicornWorker start_api:app --bind 0.0.0.0:8000
-
-# Or use Docker
-docker build -t forensic-api .
-docker run -p 8000:8000 forensic-api
-```
-
-2. **Frontend Deployment**
-```bash
-cd src/frontend
-
-# Build for production
-npm run build
-
-# Deploy to static hosting (Netlify, Vercel, etc.)
-# Or serve with nginx/apache
-```
-
-3. **Database Migration**
-```bash
-# Migrate to PostgreSQL for production
-# Update DATABASE_URL in environment
-export DATABASE_URL=postgresql://user:pass@host:port/forensic_db
-
-# Run migrations
-python src/database/migration.py
-```
-
-## 🤝 Contributing
-
-### Development Workflow
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
-
-### Code Standards
-- **Python**: Follow PEP 8, use type hints, write docstrings
-- **TypeScript**: Use strict typing, follow ESLint rules
-- **Testing**: Maintain >80% test coverage
-- **Documentation**: Update README for new features
-
-## 📄 License
-
-This project is proprietary software for law enforcement use. Contact the development team for licensing information.
-
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **Forensic Community**: For domain expertise and requirements
 - **AI/ML Libraries**: LangChain, OpenAI, Google AI, Sentence Transformers
@@ -456,4 +395,4 @@ This project is proprietary software for law enforcement use. Contact the develo
 **Version**: 2.0.0
 **Last Updated**: September 27, 2025
 
-For technical support or feature requests, please contact the development team.
+
