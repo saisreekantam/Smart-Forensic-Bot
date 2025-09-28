@@ -14,6 +14,9 @@ The Data should include values of gps and messages the xml we used did not have 
 ### 🎥 Video Demonstration
 **Link of Google drive with Video**: [View Webapp Video Demonstration](https://drive.google.com/drive/folders/1NqEZTS1O67dbu3scGDogHwdtlbXQqZW9?usp=sharing)
 
+### Prsentation Slides
+**PPT Google Drive link**: [View Presentation](https://drive.google.com/drive/folders/1Nl7g1yU6QBPpvbr3oDtv_Gm7UF9xtAt-?usp=sharing)
+
 ---
 
 ## 🎯 Project Overview
