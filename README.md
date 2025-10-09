@@ -1,5 +1,7 @@
 # Smart Forensic Investigation Platform
 
+![Smart Forensic Platform Dashboard](https://raw.githubusercontent.com/saisreekantam/Smart-Forensic-Bot/FORENSIC_AI.png)
+
 A comprehensive AI-powered forensic investigation platform that enables law enforcement professionals to manage cases, process digital evidence, and conduct intelligent analysis through natural language interactions. The platform combines case management, evidence processing, and advanced LLM-powered chatbot capabilities.
 
 # Note:
