@@ -4,8 +4,8 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'forensic-platform'
         DOCKER_TAG = "${BUILD_NUMBER}"
-        DOCKER_CREDENTIALS = 'docker-hub-credentials'
-        GIT_CREDENTIALS = 'github-creds'
+        DOCKER_CREDENTIALS = 'saivenkat1507'
+        GIT_CREDENTIALS = 'saisreekantam'
     }
     
     stages {
