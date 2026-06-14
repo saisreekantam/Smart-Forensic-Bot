@@ -393,8 +393,5 @@ if score >= 0.6:  # Lower for broader results, higher for stricter
 
 ---
 
-**Project Status**: Active Development
-**Version**: 2.0.0
-**Last Updated**: September 27, 2025
 
 
