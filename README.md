@@ -170,6 +170,7 @@ python case_api.py # src/api/case_api.py
 # Frontend runs on http://localhost:3000 (if started separately)
 ```
 
+
 ### 4. Access the Platform
 
 - **API Documentation**: http://localhost:8000/docs
